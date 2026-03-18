@@ -1,0 +1,10 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1400" fill="#070B17"/>
+<rect x="74" y="74" width="1052" height="1252" rx="38" fill="#121C38" stroke="#283758"/>
+<rect x="430" y="360" width="340" height="420" rx="18" fill="#0A1224" stroke="#61E7FF" stroke-width="14"/>
+<path d="M450 420H750" stroke="#61E7FF" stroke-width="18"/>
+<path d="M450 500H750" stroke="#61E7FF" stroke-width="18"/>
+<path d="M450 580H680" stroke="#61E7FF" stroke-width="18"/>
+<path d="M520 780V980H680V780" stroke="#8A73FF" stroke-width="22" stroke-linejoin="round"/>
+<text x="600" y="1180" fill="#F2F7FF" font-family="Trebuchet MS, sans-serif" font-size="68" font-weight="700" text-anchor="middle">ANVIL HEAVY TEE</text>
+</svg>

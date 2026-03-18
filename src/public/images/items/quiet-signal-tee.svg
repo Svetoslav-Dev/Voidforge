@@ -1,0 +1,9 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1400" fill="#040712"/>
+<rect x="74" y="74" width="1052" height="1252" rx="38" fill="#111A34" stroke="#243352"/>
+<path d="M310 560C430 500 520 470 600 470C680 470 770 500 890 560" stroke="#61E7FF" stroke-width="22" stroke-linecap="round"/>
+<path d="M360 680H840" stroke="#61E7FF" stroke-width="10" stroke-dasharray="16 18"/>
+<path d="M440 760H760" stroke="#8A73FF" stroke-width="10" stroke-dasharray="14 18"/>
+<path d="M500 840H700" stroke="#61E7FF" stroke-width="10" stroke-dasharray="12 16"/>
+<text x="600" y="1180" fill="#F2F7FF" font-family="Trebuchet MS, sans-serif" font-size="68" font-weight="700" text-anchor="middle">QUIET SIGNAL TEE</text>
+</svg>

@@ -1,0 +1,11 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1400" fill="#050713"/>
+<rect x="74" y="74" width="1052" height="1252" rx="38" fill="#101932" stroke="#243454"/>
+<path d="M300 420L900 420" stroke="#61E7FF" stroke-width="10" stroke-dasharray="14 18"/>
+<path d="M360 560L840 560" stroke="#8A73FF" stroke-width="10" stroke-dasharray="10 14"/>
+<path d="M250 700L950 700" stroke="#61E7FF" stroke-width="10" stroke-dasharray="20 16"/>
+<path d="M420 860L780 860" stroke="#8A73FF" stroke-width="10" stroke-dasharray="12 16"/>
+<path d="M430 360L560 930" stroke="#61E7FF" stroke-width="12" stroke-linecap="round"/>
+<path d="M760 360L640 930" stroke="#8A73FF" stroke-width="12" stroke-linecap="round"/>
+<text x="600" y="1180" fill="#F2F7FF" font-family="Trebuchet MS, sans-serif" font-size="68" font-weight="700" text-anchor="middle">GHOST RELAY TEE</text>
+</svg>

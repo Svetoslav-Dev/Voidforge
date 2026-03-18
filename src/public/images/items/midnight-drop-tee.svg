@@ -1,0 +1,9 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1400" fill="#040714"/>
+<rect x="74" y="74" width="1052" height="1252" rx="38" fill="#0F1730" stroke="#243354"/>
+<circle cx="600" cy="500" r="220" fill="#0A1224"/>
+<path d="M440 500C520 410 610 390 760 410" stroke="#8B74FF" stroke-width="16" stroke-linecap="round"/>
+<path d="M420 580C540 690 670 710 810 620" stroke="#61E7FF" stroke-width="18" stroke-linecap="round"/>
+<path d="M330 860L870 860" stroke="#61E7FF" stroke-width="10" stroke-dasharray="14 18"/>
+<text x="600" y="1180" fill="#F2F7FF" font-family="Trebuchet MS, sans-serif" font-size="68" font-weight="700" text-anchor="middle">MIDNIGHT DROP TEE</text>
+</svg>

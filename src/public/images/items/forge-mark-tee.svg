@@ -1,0 +1,8 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1400" fill="#040815"/>
+<rect x="74" y="74" width="1052" height="1252" rx="38" fill="#10182E" stroke="#2A395A"/>
+<path d="M380 1040V520L600 360L820 520V1040" stroke="#60E7FF" stroke-width="30" stroke-linejoin="round"/>
+<path d="M500 620H700" stroke="#60E7FF" stroke-width="26" stroke-linecap="round"/>
+<path d="M500 720H700" stroke="#60E7FF" stroke-width="26" stroke-linecap="round"/>
+<text x="600" y="1190" fill="#F2F7FF" font-family="Trebuchet MS, sans-serif" font-size="72" font-weight="700" text-anchor="middle">FORGE MARK TEE</text>
+</svg>

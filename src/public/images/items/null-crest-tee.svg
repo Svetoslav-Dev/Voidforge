@@ -1,0 +1,8 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1400" fill="#050816"/>
+<rect x="74" y="74" width="1052" height="1252" rx="38" fill="#0E1730" stroke="#233252"/>
+<circle cx="600" cy="520" r="180" fill="#0A1122" stroke="#8E79FF" stroke-width="14"/>
+<path d="M490 520H710" stroke="#63E6FF" stroke-width="24" stroke-linecap="round"/>
+<path d="M600 410V630" stroke="#63E6FF" stroke-width="24" stroke-linecap="round"/>
+<text x="600" y="1180" fill="#F2F7FF" font-family="Trebuchet MS, sans-serif" font-size="68" font-weight="700" text-anchor="middle">NULL CREST TEE</text>
+</svg>

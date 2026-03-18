@@ -1,0 +1,8 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1400" fill="#060B18"/>
+<rect x="80" y="80" width="1040" height="1240" rx="36" fill="#0E1830" stroke="#243250"/>
+<circle cx="600" cy="420" r="210" fill="#101F3D"/>
+<circle cx="600" cy="420" r="150" fill="#0A1122" stroke="#58E5FF" stroke-width="10"/>
+<path d="M390 980C456 844 523 776 600 776C677 776 744 844 810 980" stroke="#58E5FF" stroke-width="24" stroke-linecap="round"/>
+<text x="600" y="1160" fill="#EAF2FF" font-family="Trebuchet MS, sans-serif" font-size="74" font-weight="700" text-anchor="middle">VOIDFORGE</text>
+</svg>

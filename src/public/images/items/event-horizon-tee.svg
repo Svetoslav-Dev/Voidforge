@@ -1,0 +1,9 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1400" fill="#02050E"/>
+<rect x="74" y="74" width="1052" height="1252" rx="38" fill="#0D1630" stroke="#22324F"/>
+<circle cx="600" cy="540" r="250" fill="#050913"/>
+<circle cx="600" cy="540" r="188" stroke="#61E7FF" stroke-width="18"/>
+<circle cx="600" cy="540" r="132" stroke="#8A73FF" stroke-width="10" stroke-dasharray="10 18"/>
+<circle cx="600" cy="540" r="56" fill="#61E7FF"/>
+<text x="600" y="1180" fill="#F2F7FF" font-family="Trebuchet MS, sans-serif" font-size="64" font-weight="700" text-anchor="middle">EVENT HORIZON TEE</text>
+</svg>
