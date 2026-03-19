@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\ShippingAddress;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -29,14 +30,6 @@ class DatabaseSeeder extends Seeder
             'password' => 'password',
         ]);
 
-        $this->upsertUser([
-            'email' => 'admin@example.com',
-        ], [
-            'name' => 'Admin User',
-            'is_admin' => true,
-            'password' => 'password',
-        ]);
-
         $this->migrateLegacyCookieUser();
 
         $cookie = $this->upsertUser([
@@ -44,7 +37,15 @@ class DatabaseSeeder extends Seeder
         ], [
             'name' => 'Demo User',
             'is_admin' => false,
-            'password' => 'password',
+            'password' => 'DemoPass123!',
+        ]);
+
+        $cookieDestroyer = $this->upsertUser([
+            'email' => 'demo-admin@example.test',
+        ], [
+            'name' => 'Demo Admin',
+            'is_admin' => true,
+            'password' => 'DemoPass123!',
         ]);
 
         $categories = [
@@ -178,15 +179,7 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        $this->seedCookiePurchaseHistory($cookie);
-    }
-
-    /**
-     * Seed a receipt history for the Cookie user.
-     */
-    private function seedCookiePurchaseHistory(User $user): void
-    {
-        $receiptOrders = [
+        $this->seedPurchaseHistory($cookie, [
             [
                 'placed_at' => Carbon::parse('2026-03-10 18:40:00'),
                 'status' => 'paid',
@@ -211,8 +204,8 @@ class DatabaseSeeder extends Seeder
                 ],
             ],
             [
-                'placed_at' => Carbon::parse('2026-03-14 20:15:00'),
-                'status' => 'paid',
+                'placed_at' => null,
+                'status' => 'awaiting_payment',
                 'currency' => 'EUR',
                 'customer_name' => 'Demo User',
                 'customer_email' => 'demo-user@example.test',
@@ -228,12 +221,92 @@ class DatabaseSeeder extends Seeder
                 ],
                 'payment' => [
                     'provider' => 'paypal',
-                    'transaction_id' => 'pp_cookie_2001',
-                    'status' => 'completed',
+                    'transaction_id' => 'pp_cookie_pending_2002',
+                    'status' => 'pending',
                 ],
             ],
-        ];
+        ]);
 
+        $this->seedPurchaseHistory($cookieDestroyer, [
+            [
+                'placed_at' => Carbon::parse('2026-03-16 19:20:00'),
+                'status' => 'paid',
+                'currency' => 'EUR',
+                'customer_name' => 'Demo Admin',
+                'customer_email' => 'demo-admin@example.test',
+                'customer_phone' => '+359-88-100-1000',
+                'shipping_address_line_1' => '99 Void Gate',
+                'shipping_address_line_2' => null,
+                'shipping_city' => 'Sofia',
+                'shipping_state' => 'Sofia City',
+                'shipping_postal_code' => '1000',
+                'shipping_country' => 'BG',
+                'items' => [
+                    ['slug' => 'midnight-drop-tee', 'quantity' => 1],
+                    ['slug' => 'null-crest-tee', 'quantity' => 1],
+                ],
+                'payment' => [
+                    'provider' => 'stripe',
+                    'transaction_id' => 'cs_cookiedestroyer_3001',
+                    'status' => 'paid',
+                ],
+            ],
+            [
+                'placed_at' => null,
+                'status' => 'awaiting_payment',
+                'currency' => 'EUR',
+                'customer_name' => 'Demo Admin',
+                'customer_email' => 'demo-admin@example.test',
+                'customer_phone' => '+359-88-100-1000',
+                'shipping_address_line_1' => '99 Void Gate',
+                'shipping_address_line_2' => null,
+                'shipping_city' => 'Sofia',
+                'shipping_state' => 'Sofia City',
+                'shipping_postal_code' => '1000',
+                'shipping_country' => 'BG',
+                'items' => [
+                    ['slug' => 'blackout-frame-tee', 'quantity' => 1],
+                ],
+                'payment' => [
+                    'provider' => 'paypal',
+                    'transaction_id' => 'pp_cookiedestroyer_pending_3002',
+                    'status' => 'pending',
+                ],
+            ],
+        ]);
+
+        $this->seedDefaultShippingAddress($cookie, [
+            'label' => 'Home',
+            'recipient_name' => 'Demo User',
+            'phone' => '+359-88-000-0000',
+            'address_line_1' => '42 Quiet Relay Ave',
+            'address_line_2' => 'Unit 5',
+            'city' => 'Nightfall',
+            'state' => 'NY',
+            'postal_code' => '10001',
+            'country' => 'BG',
+        ]);
+
+        $this->seedDefaultShippingAddress($cookieDestroyer, [
+            'label' => 'HQ',
+            'recipient_name' => 'Demo Admin',
+            'phone' => '+359-88-100-1000',
+            'address_line_1' => '99 Void Gate',
+            'address_line_2' => null,
+            'city' => 'Sofia',
+            'state' => 'Sofia City',
+            'postal_code' => '1000',
+            'country' => 'BG',
+        ]);
+    }
+
+    /**
+     * Seed a receipt history for a fixed demo user.
+     *
+     * @param  array<int, array<string, mixed>>  $receiptOrders
+     */
+    private function seedPurchaseHistory(User $user, array $receiptOrders): void
+    {
         foreach ($receiptOrders as $receiptOrder) {
             $lineItems = collect($receiptOrder['items'])->map(function (array $lineItem): array {
                 $product = Product::query()->where('slug', $lineItem['slug'])->firstOrFail();
@@ -247,10 +320,18 @@ class DatabaseSeeder extends Seeder
 
             $subtotalCents = (int) $lineItems->sum('line_total_cents');
 
-            $order = Order::query()->updateOrCreate([
+            $identity = [
                 'user_id' => $user->id,
-                'placed_at' => $receiptOrder['placed_at'],
-            ], [
+                'status' => $receiptOrder['status'],
+                'customer_email' => $receiptOrder['customer_email'],
+                'shipping_address_line_1' => $receiptOrder['shipping_address_line_1'],
+            ];
+
+            if ($receiptOrder['placed_at']) {
+                $identity['placed_at'] = $receiptOrder['placed_at'];
+            }
+
+            $order = Order::query()->updateOrCreate($identity, [
                 'status' => $receiptOrder['status'],
                 'currency' => $receiptOrder['currency'],
                 'subtotal_cents' => $subtotalCents,
@@ -265,6 +346,7 @@ class DatabaseSeeder extends Seeder
                 'shipping_state' => $receiptOrder['shipping_state'],
                 'shipping_postal_code' => $receiptOrder['shipping_postal_code'],
                 'shipping_country' => $receiptOrder['shipping_country'],
+                'placed_at' => $receiptOrder['placed_at'],
             ]);
 
             foreach ($lineItems as $lineItem) {
@@ -288,6 +370,33 @@ class DatabaseSeeder extends Seeder
                 'amount' => $subtotalCents,
                 'status' => $receiptOrder['payment']['status'],
             ]);
+        }
+    }
+
+    /**
+     * Seed a deterministic default shipping address for a fixed demo user.
+     *
+     * @param  array<string, mixed>  $address
+     */
+    private function seedDefaultShippingAddress(User $user, array $address): void
+    {
+        ShippingAddress::withTrashed()
+            ->where('user_id', $user->id)
+            ->update(['is_default' => false]);
+
+        $shippingAddress = ShippingAddress::withTrashed()->updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'label' => $address['label'],
+            ],
+            $address + [
+                'user_id' => $user->id,
+                'is_default' => true,
+            ]
+        );
+
+        if ($shippingAddress->trashed()) {
+            $shippingAddress->restore();
         }
     }
 
