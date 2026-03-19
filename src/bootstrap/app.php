@@ -3,7 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\EnsureCartIsNotEmpty;
 use App\Http\Middleware\EnsureAdmin;
+use App\Http\Middleware\EnsureOrderOwnerOrAdmin;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -23,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => EnsureAdmin::class,
+            'cart.not_empty' => EnsureCartIsNotEmpty::class,
+            'order.owner_or_admin' => EnsureOrderOwnerOrAdmin::class,
         ]);
 
         $middleware->preventRequestForgery(except: [

@@ -35,16 +35,16 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/{product}', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
-Route::get('/shipping', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::get('/shipping', [CheckoutController::class, 'index'])->middleware('cart.not_empty')->name('checkout.index');
 Route::get('/checkout', [CheckoutController::class, 'payment'])->name('checkout.payment');
 Route::get('/checkout/complete', [CheckoutController::class, 'complete'])->name('checkout.complete');
 Route::get('/checkout/complete/download', [CheckoutController::class, 'download'])->name('checkout.download');
-Route::post('/shipping', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/shipping', [CheckoutController::class, 'store'])->middleware('cart.not_empty')->name('checkout.store');
 Route::post('/shipping/back', [CheckoutController::class, 'back'])->name('checkout.back');
 Route::post('/shipping/address', [CheckoutController::class, 'selectAddress'])->middleware('auth')->name('checkout.address');
 Route::get('/checkout/{order}', [CheckoutController::class, 'show'])->name('checkout.show');
-Route::post('/checkout/{order}/stripe', [StripeCheckoutController::class, 'store'])->name('stripe.checkout.store');
-Route::post('/checkout/{order}/paypal', [PayPalCheckoutController::class, 'store'])->name('paypal.checkout.store');
+Route::post('/checkout/{order}/stripe', [StripeCheckoutController::class, 'store'])->middleware('throttle:checkout.payment-start')->name('stripe.checkout.store');
+Route::post('/checkout/{order}/paypal', [PayPalCheckoutController::class, 'store'])->middleware('throttle:checkout.payment-start')->name('paypal.checkout.store');
 Route::get('/checkout/paypal/return', [PayPalCheckoutController::class, 'complete'])->name('paypal.checkout.return');
 Route::get('/checkout/{order}/paypal/cancel', [PayPalCheckoutController::class, 'cancel'])->name('paypal.checkout.cancel');
 Route::post('/webhooks/stripe', [StripeCheckoutController::class, 'webhook'])->name('stripe.webhook');
@@ -52,28 +52,28 @@ Route::post('/webhooks/paypal', [PayPalCheckoutController::class, 'webhook'])->n
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/register', [RegisteredUserController::class, 'store']);
+    Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('throttle:auth.register');
 
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:auth.login');
 });
 
 Route::middleware('auth')->group(function () {
     Route::get('/account', DashboardController::class)->name('dashboard');
     Route::delete('/account', [DashboardController::class, 'destroy'])->name('account.destroy');
     Route::get('/account/addresses', [AccountShippingAddressController::class, 'index'])->name('account.addresses.index');
-    Route::post('/account/addresses', [AccountShippingAddressController::class, 'store'])->name('account.addresses.store');
+    Route::post('/account/addresses', [AccountShippingAddressController::class, 'store'])->middleware('throttle:account.addresses.store')->name('account.addresses.store');
     Route::get('/account/addresses/{shippingAddress}/edit', [AccountShippingAddressController::class, 'edit'])->name('account.addresses.edit');
     Route::patch('/account/addresses/{shippingAddress}', [AccountShippingAddressController::class, 'update'])->name('account.addresses.update');
     Route::patch('/account/addresses/{shippingAddress}/default', [AccountShippingAddressController::class, 'makeDefault'])->name('account.addresses.default');
     Route::delete('/account/addresses/{shippingAddress}', [AccountShippingAddressController::class, 'destroy'])->name('account.addresses.destroy');
     Route::get('/account/payment-methods', [AccountPaymentMethodController::class, 'index'])->name('account.payment-methods.index');
-    Route::post('/account/payment-methods', [AccountPaymentMethodController::class, 'store'])->name('account.payment-methods.store');
+    Route::post('/account/payment-methods', [AccountPaymentMethodController::class, 'store'])->middleware('throttle:account.payment-methods.store')->name('account.payment-methods.store');
     Route::patch('/account/payment-methods/{paymentMethod}/default', [AccountPaymentMethodController::class, 'makeDefault'])->name('account.payment-methods.default');
     Route::delete('/account/payment-methods/{paymentMethod}', [AccountPaymentMethodController::class, 'destroy'])->name('account.payment-methods.destroy');
     Route::get('/orders', [OrderHistoryController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{orderReference}', [OrderHistoryController::class, 'show'])->name('orders.show');
-    Route::get('/orders/{orderReference}/download', [OrderHistoryController::class, 'download'])->name('orders.download');
+    Route::get('/orders/{orderReference}', [OrderHistoryController::class, 'show'])->middleware('order.owner_or_admin')->name('orders.show');
+    Route::get('/orders/{orderReference}/download', [OrderHistoryController::class, 'download'])->middleware('order.owner_or_admin')->name('orders.download');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 

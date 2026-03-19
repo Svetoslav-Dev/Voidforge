@@ -67,7 +67,7 @@ class OrderHistoryTest extends TestCase
             ->get(route('orders.download', ['orderReference' => 'VF'.$order->id]))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf')
-            ->assertHeader('content-disposition', 'attachment; filename="voidforge-receipt-'.$order->id.'.pdf"');
+            ->assertHeader('content-disposition', 'attachment; filename="voidforge-receipt-VF'.$order->id.'.pdf"');
     }
 
     public function test_user_can_open_and_repay_their_pending_order(): void
