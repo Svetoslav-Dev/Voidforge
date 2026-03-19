@@ -23,31 +23,72 @@ class OrderHistoryTest extends TestCase
             ->assertOk()
             ->assertSee('Purchase History')
             ->assertSee('Forge Mark Tee')
-            ->assertSee((string) $order->id);
+            ->assertSee('VF'.$order->id);
+
+        $this->assertSame(
+            '/orders/VF'.$order->id,
+            route('orders.show', ['orderReference' => 'VF'.$order->id], false)
+        );
     }
 
     public function test_user_can_open_their_own_receipt_but_not_another_users_receipt(): void
     {
         $user = User::factory()->create();
         $otherUser = User::factory()->create();
+        $admin = User::factory()->create(['is_admin' => true]);
         $ownOrder = $this->orderFor($user, transactionId: 'tx-own');
         $otherOrder = $this->orderFor($otherUser, transactionId: 'tx-other');
 
         $this->actingAs($user)
-            ->get(route('orders.show', $ownOrder))
+            ->get(route('orders.show', ['orderReference' => 'VF'.$ownOrder->id]))
             ->assertOk()
-            ->assertSee('Transaction: tx-own');
+            ->assertSee('Order #VF'.$ownOrder->id)
+            ->assertDontSee('Transaction: tx-own');
 
         $this->actingAs($user)
-            ->get(route('orders.show', $otherOrder))
+            ->get(route('orders.show', ['orderReference' => 'VF'.$otherOrder->id]))
             ->assertNotFound();
+
+        $this->actingAs($admin)
+            ->get(route('orders.show', ['orderReference' => 'VF'.$otherOrder->id]))
+            ->assertOk()
+            ->assertSee('Order #VF'.$otherOrder->id);
     }
 
-    private function orderFor(User $user, string $transactionId = 'tx-1000'): Order
+    public function test_user_can_download_their_receipt_as_pdf(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Cookie Destroyer',
+            'email' => 'cookie-destroyer@example.test',
+        ]);
+        $order = $this->orderFor($user, transactionId: 'tx-pdf');
+
+        $this->actingAs($user)
+            ->get(route('orders.download', ['orderReference' => 'VF'.$order->id]))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertHeader('content-disposition', 'attachment; filename="voidforge-receipt-'.$order->id.'.pdf"');
+    }
+
+    public function test_user_can_open_and_repay_their_pending_order(): void
+    {
+        $user = User::factory()->create();
+        $order = $this->orderFor($user, transactionId: 'tx-pending', status: 'awaiting_payment', placedAt: null);
+
+        $this->actingAs($user)
+            ->get(route('orders.show', ['orderReference' => 'VF'.$order->id]))
+            ->assertOk()
+            ->assertSee('Order #VF'.$order->id)
+            ->assertSee('No completed payment has been recorded for this order yet.')
+            ->assertSee('Pay with Stripe')
+            ->assertSee('Pay with PayPal');
+    }
+
+    private function orderFor(User $user, string $transactionId = 'tx-1000', string $status = 'paid', $placedAt = null): Order
     {
         $order = Order::query()->create([
             'user_id' => $user->id,
-            'status' => 'paid',
+            'status' => $status,
             'currency' => 'EUR',
             'subtotal_cents' => 2800,
             'shipping_cents' => 0,
@@ -61,7 +102,7 @@ class OrderHistoryTest extends TestCase
             'shipping_state' => 'CA',
             'shipping_postal_code' => '90210',
             'shipping_country' => 'US',
-            'placed_at' => now(),
+            'placed_at' => $placedAt ?? ($status === 'paid' ? now() : null),
         ]);
 
         OrderItem::query()->create([
@@ -69,6 +110,7 @@ class OrderHistoryTest extends TestCase
             'product_id' => null,
             'product_name' => 'Forge Mark Tee',
             'product_sku' => 'VF-TEE-001',
+            'product_size' => 'M',
             'unit_price_cents' => 2800,
             'quantity' => 1,
             'line_total_cents' => 2800,
@@ -79,7 +121,7 @@ class OrderHistoryTest extends TestCase
             'provider' => 'stripe',
             'transaction_id' => $transactionId,
             'amount' => 2800,
-            'status' => 'paid',
+            'status' => $status === 'paid' ? 'paid' : 'pending',
         ]);
 
         return $order;

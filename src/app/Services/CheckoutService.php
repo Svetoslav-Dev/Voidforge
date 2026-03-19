@@ -60,12 +60,12 @@ class CheckoutService
             $order = Order::query()->create([
                 ...$customerData,
                 'user_id' => $user?->id,
-                'status' => 'pending',
+                'status' => 'awaiting_payment',
                 'currency' => 'EUR',
                 'subtotal_cents' => $subtotalCents,
                 'shipping_cents' => 0,
                 'total_cents' => $subtotalCents,
-                'placed_at' => now(),
+                'placed_at' => null,
             ]);
 
             foreach ($items as $item) {
@@ -85,7 +85,6 @@ class CheckoutService
                 $product->decrement('stock', $item['quantity']);
             }
 
-            $this->cart->clear();
             session()->put('checkout.last_order_email', $order->customer_email);
 
             return $order->load('items');

@@ -19,14 +19,12 @@ class StripeCheckoutController extends Controller
         $this->abortUnlessCanAccessOrder($request, $order);
 
         if ($order->status === 'paid') {
-            return redirect()
-                ->route('checkout.show', $order)
+            return $this->redirectToCheckoutStep($order)
                 ->with('status', 'This order has already been paid.');
         }
 
         if (! $stripe->isConfigured()) {
-            return redirect()
-                ->route('checkout.show', $order)
+            return $this->redirectToCheckoutStep($order)
                 ->withErrors([
                     'payment' => 'Stripe is not configured for this environment yet.',
                 ]);
@@ -69,5 +67,12 @@ class StripeCheckoutController extends Controller
         ) {
             throw new NotFoundHttpException();
         }
+    }
+
+    private function redirectToCheckoutStep(Order $order): RedirectResponse
+    {
+        return $order->placed_at
+            ? redirect()->route('checkout.complete')
+            : redirect()->route('checkout.index');
     }
 }

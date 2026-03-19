@@ -1,15 +1,24 @@
-# Don't show ze agents
+# Editing files
+.README.md.swp
+
+# Hide stuff from env
 .env
 .env.testing
+
+# packages
 /src/vendor
 /src/node_modules
 /src/.env
+
+#Storage cache
 /src/storage/*.key
 /src/storage/logs/*.log
 /src/storage/framework/cache/data/*
 /src/storage/framework/sessions/*
 /src/storage/framework/testing/*
 /src/storage/framework/views/*
+
+# Docker cache
 /docker/runtime/storage/logs/*
 /docker/runtime/storage/framework/cache/data/*
 /docker/runtime/storage/framework/sessions/*

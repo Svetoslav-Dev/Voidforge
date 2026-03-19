@@ -19,14 +19,12 @@ class PayPalCheckoutController extends Controller
         $this->abortUnlessCanAccessOrder($request, $order);
 
         if ($order->status === 'paid') {
-            return redirect()
-                ->route('checkout.show', $order)
+            return $this->redirectToCheckoutStep($order)
                 ->with('status', 'This order has already been paid.');
         }
 
         if (! $paypal->isConfigured()) {
-            return redirect()
-                ->route('checkout.show', $order)
+            return $this->redirectToCheckoutStep($order)
                 ->withErrors([
                     'payment' => 'PayPal is not configured for this environment yet.',
                 ]);
@@ -45,9 +43,10 @@ class PayPalCheckoutController extends Controller
 
         $order = $paypal->captureApprovedOrder($token);
         $request->session()->put('checkout.last_order_email', $order->customer_email);
+        $request->session()->put('checkout.completed_order_id', $order->id);
 
         return redirect()
-            ->route('checkout.show', $order)
+            ->route($order->placed_at ? 'checkout.complete' : 'checkout.index')
             ->with('status', 'PayPal payment processed.');
     }
 
@@ -61,7 +60,7 @@ class PayPalCheckoutController extends Controller
         $paypal->markCancelled($order);
 
         return redirect()
-            ->route('checkout.show', $order)
+            ->route($order->placed_at ? 'checkout.show' : 'checkout.index', $order->placed_at ? $order : [])
             ->with('status', 'PayPal checkout was cancelled.');
     }
 
@@ -94,5 +93,12 @@ class PayPalCheckoutController extends Controller
         ) {
             throw new NotFoundHttpException();
         }
+    }
+
+    private function redirectToCheckoutStep(Order $order): RedirectResponse
+    {
+        return $order->placed_at
+            ? redirect()->route('checkout.complete')
+            : redirect()->route('checkout.index');
     }
 }

@@ -26,12 +26,18 @@
             <article class="card">
                 <div class="receipt-header">
                     <div>
+                        @if (auth()->id() === $user->id)
+                            <p style="margin: 0 0 0.25rem; font-weight: 700; color: #ffb86b;">Current user</p>
+                        @endif
                         <p class="muted">{{ $user->email }}</p>
                         <h2 style="margin: 0 0 0.4rem;">{{ $user->name }}</h2>
                         <p class="muted">
                             {{ $user->is_admin ? 'Admin' : 'Customer' }}
                             ·
                             {{ $user->deleted_at ? 'Archived' : 'Active' }}
+                            ·
+                            Last login:
+                            {{ $user->last_login_at?->format('M d, Y H:i') ?? 'Never' }}
                         </p>
                     </div>
 

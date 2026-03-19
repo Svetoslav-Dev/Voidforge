@@ -34,6 +34,7 @@ class Order extends Model
         'shipping_postal_code',
         'shipping_country',
         'placed_at',
+        'receipt_emailed_at',
     ];
 
     /**
@@ -45,6 +46,7 @@ class Order extends Model
     {
         return [
             'placed_at' => 'datetime',
+            'receipt_emailed_at' => 'datetime',
         ];
     }
 

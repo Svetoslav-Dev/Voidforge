@@ -43,13 +43,14 @@ class AdminPanelTest extends TestCase
             ->assertSee('Catalogs');
     }
 
-    public function test_admin_dashboard_route_redirects_to_the_admin_panel(): void
+    public function test_admin_can_open_my_account_page(): void
     {
         $admin = User::factory()->admin()->create();
 
         $this->actingAs($admin)
             ->get(route('dashboard'))
-            ->assertRedirect(route('admin.panel'));
+            ->assertOk()
+            ->assertSee('My Account');
     }
 
     public function test_admin_can_create_a_product(): void
@@ -322,6 +323,23 @@ class AdminPanelTest extends TestCase
             'id' => $user->id,
             'deleted_at' => null,
         ]);
+    }
+
+    public function test_admin_users_listing_shows_last_login_date(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $user = User::factory()->create([
+            'name' => 'Recent Login',
+            'email' => 'recent-login@example.test',
+            'last_login_at' => now()->setDate(2026, 3, 19)->setTime(10, 30),
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.users.index'))
+            ->assertOk()
+            ->assertSee('Recent Login')
+            ->assertSee('Last login:')
+            ->assertSee('Mar 19, 2026 10:30');
     }
 
     public function test_admin_can_create_a_user_and_choose_admin_role(): void

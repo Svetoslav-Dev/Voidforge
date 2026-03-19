@@ -22,9 +22,9 @@ class AdminPanelController extends Controller
             'productCount' => Product::query()->count(),
             'activeProductCount' => Product::query()->where('is_active', true)->count(),
             'archivedProductCount' => Product::onlyTrashed()->count(),
-            'orderCount' => Order::query()->count(),
-            'archivedOrderCount' => Order::onlyTrashed()->count(),
-            'pendingOrderCount' => Order::query()->where('status', 'pending')->count(),
+            'orderCount' => Order::query()->whereNotNull('placed_at')->count(),
+            'archivedOrderCount' => Order::onlyTrashed()->whereNotNull('placed_at')->count(),
+            'pendingOrderCount' => Order::query()->whereNotNull('placed_at')->where('status', 'pending')->count(),
             'userCount' => User::query()->count(),
             'archivedUserCount' => User::onlyTrashed()->count(),
         ]);

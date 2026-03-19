@@ -16,7 +16,7 @@
             <article class="card">
                 <div class="receipt-header">
                     <div>
-                        <p class="muted">Order #{{ $order->id }}</p>
+                        <p class="muted">Order #VF{{ $order->id }}</p>
                         <h2 style="margin: 0 0 0.4rem;">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</h2>
                         <p class="muted">
                             {{ optional($order->placed_at)->format('M d, Y') ?? $order->created_at->format('M d, Y') }}
@@ -33,14 +33,23 @@
                 </div>
 
                 @foreach ($order->items as $item)
-                    <p class="summary-line plain-line">
-                        <span>{{ $item->product_name }} · {{ $item->product_size }} x {{ $item->quantity }}</span>
-                        <strong>{{ number_format($item->line_total_cents / 100, 2) }} EUR</strong>
-                    </p>
+                    <div class="receipt-item">
+                        <div class="product-visual">
+                            <img src="{{ $item->product?->image_url ?? asset('images/items/fallback.svg') }}" alt="{{ $item->product_name }}">
+                        </div>
+
+                        <p class="summary-line plain-line">
+                            <span>{{ $item->product_name }} · {{ $item->product_size }} x {{ $item->quantity }}</span>
+                            <strong>{{ number_format($item->line_total_cents / 100, 2) }} EUR</strong>
+                        </p>
+                    </div>
                 @endforeach
 
                 <div class="actions">
-                    <a class="button secondary" href="{{ route('orders.show', $order) }}">Open receipt</a>
+                    <a class="button secondary" href="{{ route('orders.show', ['orderReference' => 'VF'.$order->id]) }}">Open receipt</a>
+                    @if ($order->placed_at)
+                        <a class="button secondary" href="{{ route('orders.download', ['orderReference' => 'VF'.$order->id]) }}">Download PDF</a>
+                    @endif
                 </div>
             </article>
         @empty

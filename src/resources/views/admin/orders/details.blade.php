@@ -31,10 +31,16 @@
         <article class="card">
             <h2>Shirts</h2>
             @foreach ($order->items as $item)
-                <p class="summary-line plain-line">
-                    <span>{{ $item->product_name }} · {{ $item->product_size }} x {{ $item->quantity }}</span>
-                    <strong>{{ number_format($item->line_total_cents / 100, 2) }} EUR</strong>
-                </p>
+                <div class="receipt-item">
+                    <div class="product-visual">
+                        <img src="{{ $item->product?->image_url ?? asset('images/items/fallback.svg') }}" alt="{{ $item->product_name }}">
+                    </div>
+
+                    <p class="summary-line plain-line">
+                        <span>{{ $item->product_name }} · {{ $item->product_size }} x {{ $item->quantity }}</span>
+                        <strong>{{ number_format($item->line_total_cents / 100, 2) }} EUR</strong>
+                    </p>
+                </div>
             @endforeach
         </article>
 

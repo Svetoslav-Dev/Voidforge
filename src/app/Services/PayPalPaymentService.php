@@ -21,7 +21,8 @@ use PaypalServerSdkLib\Models\Builders\ShippingNameBuilder;
 class PayPalPaymentService
 {
     public function __construct(
-        private readonly PayPalGateway $gateway
+        private readonly PayPalGateway $gateway,
+        private ?OrderCompletionMailService $orderCompletionMailService = null,
     ) {
     }
 
@@ -95,9 +96,18 @@ class PayPalPaymentService
 
         $payment->order->forceFill([
             'status' => $payment->status === 'paid' ? 'paid' : 'payment_failed',
+            'placed_at' => $payment->status === 'paid'
+                ? ($payment->order->placed_at ?? now())
+                : $payment->order->placed_at,
         ])->save();
 
-        return $payment->order->fresh('items');
+        $order = $payment->order->fresh(['items.product', 'payments']);
+
+        if ($order->status === 'paid') {
+            $this->orderCompletionMailService()->sendFor($order);
+        }
+
+        return $order;
     }
 
     /**
@@ -120,6 +130,7 @@ class PayPalPaymentService
 
         $order->forceFill([
             'status' => 'cancelled',
+            'placed_at' => null,
         ])->save();
     }
 
@@ -169,7 +180,7 @@ class PayPalPaymentService
             return;
         }
 
-        DB::transaction(function () use ($body, $eventType, $orderId): void {
+        $order = DB::transaction(function () use ($body, $eventType, $orderId): ?Order {
             $payment = Payment::query()
                 ->where('provider', 'paypal')
                 ->where('order_id', $orderId)
@@ -198,10 +209,19 @@ class PayPalPaymentService
                 'status' => match ($payment->status) {
                     'paid' => 'paid',
                     'failed' => 'payment_failed',
-                    default => 'pending',
+                    default => 'awaiting_payment',
                 },
-            ])->save();
+                'placed_at' => $payment->status === 'paid'
+                    ? ($payment->order?->placed_at ?? now())
+                    : $payment->order?->placed_at,
+                ])->save();
+
+            return $payment->order?->fresh(['items.product', 'payments']);
         });
+
+        if ($order?->status === 'paid') {
+            $this->orderCompletionMailService()->sendFor($order);
+        }
     }
 
     /**
@@ -276,6 +296,11 @@ class PayPalPaymentService
         }
 
         throw new InvalidArgumentException('PayPal approval link was not returned.');
+    }
+
+    private function orderCompletionMailService(): OrderCompletionMailService
+    {
+        return $this->orderCompletionMailService ??= app(OrderCompletionMailService::class);
     }
 
     /**

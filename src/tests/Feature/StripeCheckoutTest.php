@@ -63,7 +63,7 @@ class StripeCheckoutTest extends TestCase
         $this->withSession([
             'checkout.last_order_email' => $order->customer_email,
         ])->post(route('stripe.checkout.store', $order))
-            ->assertRedirect(route('checkout.show', $order))
+            ->assertRedirect(route('checkout.complete'))
             ->assertSessionHasErrors('payment');
     }
 
@@ -85,6 +85,28 @@ class StripeCheckoutTest extends TestCase
             ],
             '{"id":"evt_123"}'
         )->assertOk();
+    }
+
+    public function test_successful_stripe_return_finalizes_the_order_and_redirects_to_confirmation(): void
+    {
+        $order = $this->order();
+
+        $stripe = Mockery::mock(StripePaymentService::class);
+        $stripe->shouldReceive('completeCheckoutPayment')->once()->with('cs_test_123')->andReturn($order->forceFill([
+            'status' => 'paid',
+            'placed_at' => now(),
+        ]));
+        $this->app->instance(StripePaymentService::class, $stripe);
+
+        $this->withSession([
+            'checkout.last_order_email' => $order->customer_email,
+            'checkout.pending_order_id' => $order->id,
+        ])->get(route('checkout.index', [
+            'stripe' => 'success',
+            'session_id' => 'cs_test_123',
+        ]))
+            ->assertRedirect(route('checkout.complete'))
+            ->assertSessionHas('status', 'Stripe payment processed.');
     }
 
     private function order(?User $user = null): Order

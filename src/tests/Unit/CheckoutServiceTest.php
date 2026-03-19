@@ -28,7 +28,7 @@ class CheckoutServiceTest extends TestCase
         $this->checkout = app(CheckoutService::class);
     }
 
-    public function test_it_creates_an_order_snapshots_items_and_clears_the_cart(): void
+    public function test_it_creates_an_awaiting_payment_order_snapshots_items_and_keeps_the_cart(): void
     {
         $user = User::factory()->create();
         $product = $this->product(stock: 8, priceCents: 3400);
@@ -36,14 +36,14 @@ class CheckoutServiceTest extends TestCase
 
         $order = $this->checkout->placeOrder($this->customerData(), $user);
 
-        $this->assertSame('pending', $order->status);
+        $this->assertSame('awaiting_payment', $order->status);
         $this->assertSame($user->id, $order->user_id);
         $this->assertSame(6800, $order->total_cents);
         $this->assertCount(1, $order->items);
         $this->assertSame('Forge Mark Tee', $order->items->first()->product_name);
         $this->assertSame('VF-TEE-001', $order->items->first()->product_sku);
         $this->assertSame('XL', $order->items->first()->product_size);
-        $this->assertSame([], session('cart.items', []));
+        $this->assertSame([$product->id.':XL' => 2], session('cart.items', []));
         $this->assertSame('taylor@example.test', session('checkout.last_order_email'));
         $this->assertSame(6, $product->fresh()->stock);
     }

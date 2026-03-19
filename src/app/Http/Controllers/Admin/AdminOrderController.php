@@ -21,6 +21,7 @@ class AdminOrderController extends Controller
         return view('admin.orders.listing', [
             'orders' => Order::query()
                 ->withTrashed()
+                ->whereNotNull('placed_at')
                 ->with(['user', 'payments'])
                 ->when($search !== '', function ($query) use ($search) {
                     $query->where(function ($builder) use ($search) {
@@ -31,7 +32,7 @@ class AdminOrderController extends Controller
                             ->orWhere('id', 'like', '%'.$search.'%');
                     });
                 })
-                ->orderByDesc('created_at')
+                ->orderByRaw('COALESCE(placed_at, created_at) DESC')
                 ->paginate(15)
                 ->withQueryString(),
             'search' => $search,

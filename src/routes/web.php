@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\AccountPaymentMethodController;
+use App\Http\Controllers\AccountShippingAddressController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminPanelController;
 use App\Http\Controllers\Admin\AdminProductController;
@@ -34,7 +36,9 @@ Route::post('/cart/{product}', [CartController::class, 'store'])->name('cart.sto
 Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::get('/checkout/complete', [CheckoutController::class, 'complete'])->name('checkout.complete');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/address', [CheckoutController::class, 'selectAddress'])->middleware('auth')->name('checkout.address');
 Route::get('/checkout/{order}', [CheckoutController::class, 'show'])->name('checkout.show');
 Route::post('/checkout/{order}/stripe', [StripeCheckoutController::class, 'store'])->name('stripe.checkout.store');
 Route::post('/checkout/{order}/paypal', [PayPalCheckoutController::class, 'store'])->name('paypal.checkout.store');
@@ -53,8 +57,19 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/account', DashboardController::class)->name('dashboard');
+    Route::delete('/account', [DashboardController::class, 'destroy'])->name('account.destroy');
+    Route::get('/account/addresses', [AccountShippingAddressController::class, 'index'])->name('account.addresses.index');
+    Route::post('/account/addresses', [AccountShippingAddressController::class, 'store'])->name('account.addresses.store');
+    Route::get('/account/addresses/{shippingAddress}/edit', [AccountShippingAddressController::class, 'edit'])->name('account.addresses.edit');
+    Route::patch('/account/addresses/{shippingAddress}', [AccountShippingAddressController::class, 'update'])->name('account.addresses.update');
+    Route::delete('/account/addresses/{shippingAddress}', [AccountShippingAddressController::class, 'destroy'])->name('account.addresses.destroy');
+    Route::get('/account/payment-methods', [AccountPaymentMethodController::class, 'index'])->name('account.payment-methods.index');
+    Route::post('/account/payment-methods', [AccountPaymentMethodController::class, 'store'])->name('account.payment-methods.store');
+    Route::patch('/account/payment-methods/{paymentMethod}/default', [AccountPaymentMethodController::class, 'makeDefault'])->name('account.payment-methods.default');
+    Route::delete('/account/payment-methods/{paymentMethod}', [AccountPaymentMethodController::class, 'destroy'])->name('account.payment-methods.destroy');
     Route::get('/orders', [OrderHistoryController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [OrderHistoryController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{orderReference}', [OrderHistoryController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{orderReference}/download', [OrderHistoryController::class, 'download'])->name('orders.download');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 

@@ -48,7 +48,7 @@ class PayPalCheckoutTest extends TestCase
         $this->withSession([
             'checkout.last_order_email' => $order->customer_email,
         ])->post(route('paypal.checkout.store', $order))
-            ->assertRedirect(route('checkout.show', $order))
+            ->assertRedirect(route('checkout.complete'))
             ->assertSessionHasErrors('payment');
     }
 
@@ -61,7 +61,7 @@ class PayPalCheckoutTest extends TestCase
         $this->app->instance(PayPalPaymentService::class, $paypal);
 
         $this->get(route('paypal.checkout.return', ['token' => 'PAYPAL-TOKEN']))
-            ->assertRedirect(route('checkout.show', $order))
+            ->assertRedirect(route('checkout.complete'))
             ->assertSessionHas('status', 'PayPal payment processed.');
     }
 

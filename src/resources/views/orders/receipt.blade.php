@@ -1,20 +1,27 @@
-@extends('layouts.app', ['title' => 'Receipt #'.$order->id.' | Voidforge'])
+@extends('layouts.app', ['title' => 'Order #VF'.$order->id.' | Voidforge'])
 
 @section('content')
     <section class="card hero">
         <div class="receipt-header">
             <div>
-                <p class="muted">Receipt</p>
-                <h1>Order #{{ $order->id }}</h1>
+                <p class="muted">{{ $order->placed_at ? 'Receipt' : 'Pending Order' }}</p>
+                <h1>Order #VF{{ $order->id }}</h1>
                 <p class="lead">
-                    Purchased by {{ $order->customer_name }} on
-                    {{ optional($order->placed_at)->format('F d, Y') ?? $order->created_at->format('F d, Y') }}.
+                    @if ($order->placed_at)
+                        Purchased by {{ $order->customer_name }} on
+                        {{ optional($order->placed_at)->format('F d, Y') ?? $order->created_at->format('F d, Y') }}.
+                    @else
+                        This order is waiting for payment confirmation. You can finish payment below.
+                    @endif
                 </p>
             </div>
 
             <div style="text-align: right;">
                 <p class="muted">Status</p>
                 <h2 style="margin: 0;">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</h2>
+                <div class="actions" style="justify-content: flex-end;">
+                    <a class="button secondary" href="{{ route('orders.index') }}">Back to receipt history</a>
+                </div>
             </div>
         </div>
     </section>
@@ -43,39 +50,55 @@
 
         <article class="card">
             <h2>Receipt Details</h2>
-            <p class="muted">{{ $order->customer_email }}</p>
+            <p><strong>Name:</strong> <span class="muted">{{ $order->customer_name }}</span></p>
+            <p><strong>Email:</strong> <span class="muted">{{ $order->customer_email }}</span></p>
             @if ($order->customer_phone)
-                <p class="muted">{{ $order->customer_phone }}</p>
+                <p><strong>Phone:</strong> <span class="muted">{{ $order->customer_phone }}</span></p>
             @endif
-            <p class="muted">
-                {{ $order->shipping_address_line_1 }}
-                @if ($order->shipping_address_line_2)
-                    , {{ $order->shipping_address_line_2 }}
-                @endif
-                , {{ $order->shipping_city }}
-                @if ($order->shipping_state)
-                    , {{ $order->shipping_state }}
-                @endif
-                , {{ $order->shipping_postal_code }}
-                , {{ $order->shipping_country }}
+            <p>
+                <strong>Address:</strong>
+                <span class="muted">
+                    {{ $order->shipping_address_line_1 }}
+                    @if ($order->shipping_address_line_2)
+                        , {{ $order->shipping_address_line_2 }}
+                    @endif
+                </span>
             </p>
+            <p><strong>City:</strong> <span class="muted">{{ $order->shipping_city }}</span></p>
+            @if ($order->shipping_state)
+                <p><strong>State:</strong> <span class="muted">{{ $order->shipping_state }}</span></p>
+            @endif
+            <p><strong>Postal code:</strong> <span class="muted">{{ $order->shipping_postal_code }}</span></p>
+            <p><strong>Country:</strong> <span class="muted">{{ $order->shipping_country }}</span></p>
 
-            @if ($order->payments->isNotEmpty())
-                @foreach ($order->payments as $payment)
+            @php
+                $completedPayments = $order->payments->where('status', 'paid');
+            @endphp
+
+            @if ($completedPayments->isNotEmpty())
+                @foreach ($completedPayments as $payment)
                     <p class="summary-line plain-line">
                         <span>{{ ucfirst($payment->provider) }} · {{ $payment->status }}</span>
                         <strong>{{ number_format($payment->amount / 100, 2) }} EUR</strong>
                     </p>
-                    <p class="muted">Transaction: {{ $payment->transaction_id }}</p>
                 @endforeach
             @else
                 <p class="muted">No completed payment has been recorded for this order yet.</p>
             @endif
 
-            <div class="actions">
-                <a class="button secondary" href="{{ route('orders.index') }}">Back to history</a>
-                <a class="button secondary" href="{{ route('products.index') }}">Browse shirts</a>
-            </div>
+            @if ($order->status !== 'paid')
+                <div class="actions" style="margin-top: 0.75rem;">
+                    <form method="POST" action="{{ route('stripe.checkout.store', $order) }}">
+                        @csrf
+                        <button type="submit">Pay with Stripe</button>
+                    </form>
+
+                    <form method="POST" action="{{ route('paypal.checkout.store', $order) }}">
+                        @csrf
+                        <button type="submit">Pay with PayPal</button>
+                    </form>
+                </div>
+            @endif
         </article>
     </section>
 @endsection

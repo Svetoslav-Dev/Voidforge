@@ -178,6 +178,29 @@
                 box-shadow: none;
             }
 
+            .button.danger,
+            button.danger {
+                background: rgba(255, 129, 152, 0.14);
+                border-color: rgba(255, 129, 152, 0.38);
+                color: #ffd7df;
+                box-shadow: 0 0 0 1px rgba(255, 129, 152, 0.12), 0 10px 24px rgba(99, 19, 40, 0.24);
+            }
+
+            .button.danger:hover,
+            button.danger:hover {
+                background: rgba(255, 129, 152, 0.2);
+                border-color: rgba(255, 129, 152, 0.54);
+                box-shadow: 0 0 0 1px rgba(255, 129, 152, 0.18), 0 14px 30px rgba(99, 19, 40, 0.3);
+            }
+
+            .button:disabled,
+            button:disabled {
+                opacity: 0.45;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
             .auth-wrap {
                 display: grid;
                 place-items: center;
@@ -508,7 +531,7 @@
                 grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.8fr);
                 gap: 1rem;
                 margin-top: 1.5rem;
-                align-items: start;
+                align-items: stretch;
             }
 
             .cart-items {
@@ -523,6 +546,8 @@
             .checkout-form {
                 display: grid;
                 gap: 1rem;
+                height: 100%;
+                align-content: start;
             }
 
             .cart-item {
@@ -581,6 +606,49 @@
                 align-items: center;
             }
 
+            .account-card-toolbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: end;
+                gap: 1rem;
+                flex-wrap: wrap;
+                margin-top: 1rem;
+            }
+
+            .account-card-toolbar .actions {
+                margin-top: 0;
+            }
+
+            .account-delete-modal {
+                position: fixed;
+                inset: 0;
+                z-index: 50;
+                display: grid;
+                place-items: center;
+                padding: 1.5rem;
+            }
+
+            .account-delete-modal[hidden] {
+                display: none;
+            }
+
+            .account-delete-modal__backdrop {
+                position: absolute;
+                inset: 0;
+                background: rgba(2, 4, 13, 0.78);
+                backdrop-filter: blur(12px);
+            }
+
+            .account-delete-modal__panel {
+                position: relative;
+                z-index: 1;
+                width: min(100%, 30rem);
+            }
+
+            .account-delete-modal__actions {
+                justify-content: flex-end;
+            }
+
             .summary-card,
             .empty-state {
                 display: grid;
@@ -590,6 +658,7 @@
             .summary-card {
                 padding: 1.15rem;
                 align-content: start;
+                height: 100%;
             }
 
             .summary-card .actions {
@@ -713,6 +782,7 @@
                         @if (! auth()->user()->is_admin)
                             <a class="button secondary" href="{{ route('dashboard') }}">My Account</a>
                         @else
+                            <a class="button secondary" href="{{ route('dashboard') }}">My Account</a>
                             <a class="button secondary" href="{{ route('admin.panel') }}">Admin</a>
                         @endif
                     @endauth

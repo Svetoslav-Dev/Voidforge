@@ -16,11 +16,32 @@
                 <p>{{ auth()->user()->name }}</p>
                 <p class="muted">Signed in as {{ auth()->user()->email }}</p>
 
-                @if (auth()->user()->is_admin)
-                    <div class="actions">
-                        <a class="button secondary" href="{{ route('admin.panel') }}">Open admin panel</a>
+                @if ($defaultShippingAddress)
+                    <div style="margin-top: 1rem;">
+                        <p style="margin: 0 0 0.35rem; font-weight: 700;">Default shipping address</p>
+                        <p class="muted" style="margin: 0;">{{ $defaultShippingAddress->label }}</p>
+                        <p class="muted" style="margin: 0;">{{ $defaultShippingAddress->recipient_name }}</p>
+                        <p class="muted" style="margin: 0;">
+                            {{ $defaultShippingAddress->address_line_1 }},
+                            {{ $defaultShippingAddress->city }},
+                            {{ $defaultShippingAddress->postal_code }},
+                            {{ $defaultShippingAddress->country }}
+                        </p>
                     </div>
                 @endif
+
+                <div class="account-card-toolbar">
+                    <div class="actions">
+                        <a class="button secondary" href="{{ route('account.addresses.index') }}">Saved shipping addresses</a>
+                        <a class="button secondary" href="{{ route('account.payment-methods.index') }}">Saved cards</a>
+                    </div>
+
+                    <form method="POST" action="{{ route('account.destroy') }}" data-account-delete-form>
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="button danger" data-account-delete-open>Delete account</button>
+                    </form>
+                </div>
             </div>
 
             <div class="card">
@@ -32,4 +53,32 @@
             </div>
         </div>
     </section>
+
+    <div class="account-delete-modal" data-account-delete-modal hidden>
+        <div class="account-delete-modal__backdrop" data-account-delete-close></div>
+        <div class="card account-delete-modal__panel" role="dialog" aria-modal="true" aria-labelledby="account-delete-title">
+            <p class="muted">Delete account</p>
+            <h2 id="account-delete-title">Confirm account deletion</h2>
+            <p class="muted">
+                This will sign you out and archive your account. Type <strong>I am sure</strong> to enable deletion.
+            </p>
+
+            <div class="field">
+                <label for="account-delete-confirmation">Confirmation text</label>
+                <input
+                    id="account-delete-confirmation"
+                    type="text"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-account-delete-input
+                    placeholder="I am sure"
+                >
+            </div>
+
+            <div class="actions account-delete-modal__actions">
+                <button type="button" class="button secondary" data-account-delete-close>Cancel</button>
+                <button type="button" class="button danger" data-account-delete-submit disabled>Delete</button>
+            </div>
+        </div>
+    </div>
 @endsection

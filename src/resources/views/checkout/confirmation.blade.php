@@ -1,16 +1,28 @@
-@extends('layouts.app', ['title' => 'Order #'.$order->id.' | Voidforge'])
+@extends('layouts.app', ['title' => 'Order '.($order->placed_at ? 'Completed' : 'Payment Step').' | Voidforge'])
 
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Order Confirmation</p>
-            <h1>Order #{{ $order->id }} is {{ str_replace('_', ' ', $order->status) }}.</h1>
+            <p class="muted">{{ $order->placed_at ? 'Order Completed' : 'Payment Step' }}</p>
+            <h1>
+                @if ($order->placed_at)
+                    Order #VF{{ $order->id }} is {{ str_replace('_', ' ', $order->status) }}.
+                @else
+                    Checkout is {{ str_replace('_', ' ', $order->status) }}.
+                @endif
+            </h1>
             <p class="lead">
-                The order has been created and stock has been reserved.
+                @if ($order->status === 'paid')
+                    Your order has been placed and payment was confirmed.
+                    A payment provider has confirmed the payment for this order.
+                @elseif ($order->placed_at === null)
+                    Your order has not been placed yet.
+                    It will only be placed after Stripe or PayPal confirms the payment.
+                @else
+                    The order has been created and is waiting for payment confirmation.
+                @endif
                 @if ($order->status === 'paid')
                     A payment provider has confirmed the payment for this order.
-                @else
-                    Complete payment with Stripe Checkout or PayPal.
                 @endif
             </p>
         </div>
@@ -25,24 +37,27 @@
 
     <section class="grid two">
         <article class="card">
-            <h2>Shipment</h2>
-            <p>{{ $order->customer_name }}</p>
-            <p class="muted">{{ $order->customer_email }}</p>
+            <h2>Shipment details</h2>
+            <p><strong>Name:</strong> <span class="muted">{{ $order->customer_name }}</span></p>
+            <p><strong>Email:</strong> <span class="muted">{{ $order->customer_email }}</span></p>
             @if ($order->customer_phone)
-                <p class="muted">{{ $order->customer_phone }}</p>
+                <p><strong>Phone:</strong> <span class="muted">{{ $order->customer_phone }}</span></p>
             @endif
-            <p class="muted">
-                {{ $order->shipping_address_line_1 }}
-                @if ($order->shipping_address_line_2)
-                    , {{ $order->shipping_address_line_2 }}
-                @endif
-                , {{ $order->shipping_city }}
-                @if ($order->shipping_state)
-                    , {{ $order->shipping_state }}
-                @endif
-                , {{ $order->shipping_postal_code }}
-                , {{ $order->shipping_country }}
+            <p>
+                <strong>Address:</strong>
+                <span class="muted">
+                    {{ $order->shipping_address_line_1 }}
+                    @if ($order->shipping_address_line_2)
+                        , {{ $order->shipping_address_line_2 }}
+                    @endif
+                </span>
             </p>
+            <p><strong>City:</strong> <span class="muted">{{ $order->shipping_city }}</span></p>
+            @if ($order->shipping_state)
+                <p><strong>State:</strong> <span class="muted">{{ $order->shipping_state }}</span></p>
+            @endif
+            <p><strong>Postal code:</strong> <span class="muted">{{ $order->shipping_postal_code }}</span></p>
+            <p><strong>Country:</strong> <span class="muted">{{ $order->shipping_country }}</span></p>
         </article>
 
         <article class="card">
@@ -55,7 +70,7 @@
             @endforeach
             <p class="summary-line plain-line">
                 <span>Status</span>
-                <strong>{{ ucfirst($order->status) }}</strong>
+                <strong>{{ ucwords(str_replace('_', ' ', $order->status)) }}</strong>
             </p>
             <p class="summary-line total-line">
                 <span>Total</span>
@@ -63,7 +78,7 @@
             </p>
 
             @if ($order->status !== 'paid')
-                <div class="actions">
+                <div class="actions checkout-payment-actions">
                     <form method="POST" action="{{ route('stripe.checkout.store', $order) }}">
                         @csrf
                         <button type="submit">Pay with Stripe</button>
@@ -71,17 +86,18 @@
 
                     <form method="POST" action="{{ route('paypal.checkout.store', $order) }}">
                         @csrf
-                        <button class="button secondary" type="submit">Pay with PayPal</button>
+                        <button type="submit">Pay with PayPal</button>
                     </form>
                 </div>
             @endif
 
-            <div class="actions">
-                @auth
-                    <a class="button secondary" href="{{ route('orders.index') }}">Purchase history</a>
-                @endauth
-                <a class="button secondary" href="{{ route('products.index') }}">Browse shirts</a>
-            </div>
+            @if ($order->placed_at)
+                <div class="actions">
+                    @auth
+                        <a class="button secondary" href="{{ route('orders.index') }}">Purchase history</a>
+                    @endauth
+                </div>
+            @endif
         </article>
     </section>
 @endsection

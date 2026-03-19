@@ -28,6 +28,10 @@
                         <h2>Order #{{ $order->id }}</h2>
                         <p class="muted">{{ $order->customer_name }} · {{ $order->customer_email }}</p>
                         <p class="muted">
+                            Placed:
+                            {{ optional($order->placed_at)->format('M d, Y H:i') ?? $order->created_at->format('M d, Y H:i') }}
+                        </p>
+                        <p class="muted">
                             Status:
                             {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                             @if ($order->trashed())

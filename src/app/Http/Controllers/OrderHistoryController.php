@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
+use App\Services\ReceiptPdfService;
 
 class OrderHistoryController extends Controller
 {
@@ -17,8 +19,7 @@ class OrderHistoryController extends Controller
             'orders' => $request->user()
                 ->orders()
                 ->with(['items', 'payments'])
-                ->latest('placed_at')
-                ->latest('id')
+                ->orderByRaw('COALESCE(placed_at, created_at) DESC')
                 ->get(),
         ]);
     }
@@ -26,12 +27,58 @@ class OrderHistoryController extends Controller
     /**
      * Show a receipt for one of the authenticated user's orders.
      */
-    public function show(Request $request, Order $order): View
+    public function show(Request $request, string $orderReference): View
     {
-        abort_unless($order->user_id === $request->user()->id, 404);
+        $order = $this->resolveOrderReference($orderReference);
+
+        abort_unless($this->canAccessOrder($request, $order), 404);
 
         return view('orders.receipt', [
             'order' => $order->load(['items.product', 'payments']),
         ]);
+    }
+
+    /**
+     * Download a PDF receipt for one of the authenticated user's orders.
+     */
+    public function download(Request $request, string $orderReference, ReceiptPdfService $pdfs): Response
+    {
+        $order = $this->resolveOrderReference($orderReference);
+
+        abort_unless($this->canAccessOrder($request, $order) && $order->placed_at !== null, 404);
+
+        $order->load(['items.product', 'payments']);
+        $pdf = $pdfs->render($order);
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="voidforge-receipt-'.$order->id.'.pdf"',
+        ]);
+    }
+
+    /**
+     * Determine whether the current user can access the given order.
+     */
+    private function canAccessOrder(Request $request, Order $order): bool
+    {
+        $user = $request->user();
+
+        return $user !== null
+            && ($user->is_admin || $order->user_id === $user->id);
+    }
+
+    /**
+     * Resolve a public VF order reference to an order model.
+     */
+    private function resolveOrderReference(string $orderReference): Order
+    {
+        $normalized = strtoupper(trim($orderReference));
+
+        abort_unless(str_starts_with($normalized, 'VF'), 404);
+
+        $orderId = (int) substr($normalized, 2);
+        abort_unless($orderId > 0, 404);
+
+        return Order::query()->findOrFail($orderId);
     }
 }
