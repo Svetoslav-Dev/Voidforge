@@ -3,7 +3,6 @@
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Admin Users</p>
             <h1>Add a new user</h1>
             <p class="lead">Create either a regular customer account or an admin account from the dashboard.</p>
         </div>

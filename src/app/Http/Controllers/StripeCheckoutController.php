@@ -25,9 +25,7 @@ class StripeCheckoutController extends Controller
 
         if (! $stripe->isConfigured()) {
             return $this->redirectToCheckoutStep($order)
-                ->withErrors([
-                    'payment' => 'Stripe is not configured for this environment yet.',
-                ]);
+                ->with('status', 'Stripe is not configured for this environment yet.');
         }
 
         $checkoutUrl = $stripe->startCheckout($order->loadMissing('items'));
@@ -73,6 +71,6 @@ class StripeCheckoutController extends Controller
     {
         return $order->placed_at
             ? redirect()->route('checkout.complete')
-            : redirect()->route('checkout.index');
+            : redirect()->route('checkout.payment');
     }
 }

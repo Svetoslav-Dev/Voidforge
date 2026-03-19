@@ -3,7 +3,6 @@
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Admin Shirts</p>
             <h1>Edit {{ $product->name }}</h1>
         </div>
     </section>

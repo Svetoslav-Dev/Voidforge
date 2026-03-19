@@ -1,16 +1,21 @@
 @extends('layouts.app', ['title' => 'Order '.($order->placed_at ? 'Completed' : 'Payment Step').' | Voidforge'])
 
 @section('content')
+    @php($paidPayment = $order->payments->where('status', 'paid')->sortByDesc('id')->first())
     <section class="card hero">
         <div>
-            <p class="muted">{{ $order->placed_at ? 'Order Completed' : 'Payment Step' }}</p>
+            <div class="checkout-complete-heading">
             <h1>
                 @if ($order->placed_at)
-                    Order #VF{{ $order->id }} is {{ str_replace('_', ' ', $order->status) }}.
+                    Order #VF{{ $order->id }} is {{ str_replace('_', ' ', $order->status) }}
                 @else
-                    Checkout is {{ str_replace('_', ' ', $order->status) }}.
+                    Checkout is {{ str_replace('_', ' ', $order->status) }}
                 @endif
             </h1>
+            @if ($order->placed_at)
+                <a class="button secondary" href="{{ route('checkout.download') }}">Download invoice</a>
+            @endif
+            </div>
             <p class="lead">
                 @if ($order->status === 'paid')
                     Your order has been placed and payment was confirmed.
@@ -35,8 +40,8 @@
         </div>
     @enderror
 
-    <section class="grid two">
-        <article class="card">
+    <section class="grid two checkout-confirmation-grid" data-checkout-complete-cards>
+        <article class="card checkout-shipment-card" data-checkout-shipment-card>
             <h2>Shipment details</h2>
             <p><strong>Name:</strong> <span class="muted">{{ $order->customer_name }}</span></p>
             <p><strong>Email:</strong> <span class="muted">{{ $order->customer_email }}</span></p>
@@ -60,7 +65,7 @@
             <p><strong>Country:</strong> <span class="muted">{{ $order->shipping_country }}</span></p>
         </article>
 
-        <article class="card">
+        <article class="card checkout-summary-card" data-checkout-summary-card>
             <h2>Summary</h2>
             @foreach ($order->items as $item)
                 <p class="summary-line plain-line">
@@ -72,12 +77,25 @@
                 <span>Status</span>
                 <strong>{{ ucwords(str_replace('_', ' ', $order->status)) }}</strong>
             </p>
+            @if ($paidPayment)
+                <p class="summary-line plain-line">
+                    <span>Payment method</span>
+                    <strong>{{ ucfirst($paidPayment->provider) }}</strong>
+                </p>
+            @endif
             <p class="summary-line total-line">
                 <span>Total</span>
                 <strong>{{ number_format($order->total_cents / 100, 2) }} EUR</strong>
             </p>
 
             @if ($order->status !== 'paid')
+                <div class="actions checkout-back-actions">
+                    <form method="POST" action="{{ route('checkout.back') }}">
+                        @csrf
+                        <button type="submit" class="button secondary">Back to address selection</button>
+                    </form>
+                </div>
+
                 <div class="actions checkout-payment-actions">
                     <form method="POST" action="{{ route('stripe.checkout.store', $order) }}">
                         @csrf
@@ -92,7 +110,7 @@
             @endif
 
             @if ($order->placed_at)
-                <div class="actions">
+                <div class="actions checkout-complete-actions">
                     @auth
                         <a class="button secondary" href="{{ route('orders.index') }}">Purchase history</a>
                     @endauth

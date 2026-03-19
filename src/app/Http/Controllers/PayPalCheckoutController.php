@@ -25,9 +25,7 @@ class PayPalCheckoutController extends Controller
 
         if (! $paypal->isConfigured()) {
             return $this->redirectToCheckoutStep($order)
-                ->withErrors([
-                    'payment' => 'PayPal is not configured for this environment yet.',
-                ]);
+                ->with('status', 'PayPal is not configured for this environment yet.');
         }
 
         return redirect()->away($paypal->startCheckout($order->loadMissing('items')));
@@ -46,7 +44,7 @@ class PayPalCheckoutController extends Controller
         $request->session()->put('checkout.completed_order_id', $order->id);
 
         return redirect()
-            ->route($order->placed_at ? 'checkout.complete' : 'checkout.index')
+            ->route($order->placed_at ? 'checkout.complete' : 'checkout.payment')
             ->with('status', 'PayPal payment processed.');
     }
 
@@ -60,7 +58,7 @@ class PayPalCheckoutController extends Controller
         $paypal->markCancelled($order);
 
         return redirect()
-            ->route($order->placed_at ? 'checkout.show' : 'checkout.index', $order->placed_at ? $order : [])
+            ->route($order->placed_at ? 'checkout.show' : 'checkout.payment', $order->placed_at ? $order : [])
             ->with('status', 'PayPal checkout was cancelled.');
     }
 
@@ -99,6 +97,6 @@ class PayPalCheckoutController extends Controller
     {
         return $order->placed_at
             ? redirect()->route('checkout.complete')
-            : redirect()->route('checkout.index');
+            : redirect()->route('checkout.payment');
     }
 }

@@ -3,7 +3,6 @@
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Authenticated Area</p>
             <h1>My Account</h1>
             <p class="lead">
                 Review your purchase history, open receipts, and keep your account flow separate from the admin tools.
@@ -30,10 +29,32 @@
                     </div>
                 @endif
 
+                @if ($defaultSavedCard)
+                    <div style="margin-top: 1rem;">
+                        <p style="margin: 0 0 0.35rem; font-weight: 700;">Default saved card</p>
+                        <p class="muted" style="margin: 0;">
+                            {{ strtoupper($defaultSavedCard->brand ?? 'Card') }} ending in {{ $defaultSavedCard->last4 ?? '----' }}
+                        </p>
+                        <p class="muted" style="margin: 0;">
+                            Expires {{ str_pad((string) ($defaultSavedCard->exp_month ?? 0), 2, '0', STR_PAD_LEFT) }}/{{ $defaultSavedCard->exp_year ?? '----' }}
+                        </p>
+                    </div>
+                @endif
+
                 <div class="account-card-toolbar">
                     <div class="actions">
                         <a class="button secondary" href="{{ route('account.addresses.index') }}">Saved shipping addresses</a>
                         <a class="button secondary" href="{{ route('account.payment-methods.index') }}">Saved cards</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Receipts</h2>
+                <p class="muted">Open previous orders to review purchased shirts, totals, and payment details.</p>
+                <div class="account-card-toolbar">
+                    <div class="actions">
+                        <a class="button secondary" href="{{ route('orders.index') }}">Open receipts</a>
                     </div>
 
                     <form method="POST" action="{{ route('account.destroy') }}" data-account-delete-form>
@@ -41,14 +62,6 @@
                         @method('DELETE')
                         <button type="button" class="button danger" data-account-delete-open>Delete account</button>
                     </form>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>Receipts</h2>
-                <p class="muted">Open previous orders to review purchased shirts, totals, and payment details.</p>
-                <div class="actions">
-                    <a class="button secondary" href="{{ route('orders.index') }}">Open receipts</a>
                 </div>
             </div>
         </div>

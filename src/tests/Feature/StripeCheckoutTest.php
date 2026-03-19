@@ -55,6 +55,7 @@ class StripeCheckoutTest extends TestCase
     public function test_stripe_checkout_redirects_back_when_not_configured(): void
     {
         $order = $this->order();
+        $order->forceFill(['placed_at' => null])->save();
 
         $stripe = Mockery::mock(StripePaymentService::class);
         $stripe->shouldReceive('isConfigured')->once()->andReturn(false);
@@ -63,8 +64,8 @@ class StripeCheckoutTest extends TestCase
         $this->withSession([
             'checkout.last_order_email' => $order->customer_email,
         ])->post(route('stripe.checkout.store', $order))
-            ->assertRedirect(route('checkout.complete'))
-            ->assertSessionHasErrors('payment');
+            ->assertRedirect(route('checkout.payment'))
+            ->assertSessionHas('status', 'Stripe is not configured for this environment yet.');
     }
 
     public function test_stripe_webhook_endpoint_calls_the_service(): void
@@ -101,7 +102,7 @@ class StripeCheckoutTest extends TestCase
         $this->withSession([
             'checkout.last_order_email' => $order->customer_email,
             'checkout.pending_order_id' => $order->id,
-        ])->get(route('checkout.index', [
+        ])->get(route('checkout.payment', [
             'stripe' => 'success',
             'session_id' => 'cs_test_123',
         ]))

@@ -71,7 +71,11 @@
                         </div>
                         <div class="field">
                             <label for="quantity">Quantity</label>
-                            <input id="quantity" name="quantity" type="number" min="1" max="{{ min(99, $product->stock) }}" value="1" required>
+                            <select id="quantity" name="quantity" required>
+                                @foreach (range(1, min(10, $product->stock)) as $quantity)
+                                    <option value="{{ $quantity }}" @selected(old('quantity', 1) == $quantity)>{{ $quantity }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <button type="submit">Add to cart</button>
                     </form>

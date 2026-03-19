@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Account\StoreShippingAddressRequest;
 use App\Models\ShippingAddress;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -84,6 +85,31 @@ class AccountShippingAddressController extends Controller
         return redirect()
             ->route('account.addresses.index')
             ->with('status', 'Shipping address updated.');
+    }
+
+    /**
+     * Mark a saved shipping address as default for the authenticated user.
+     */
+    public function makeDefault(Request $request, ShippingAddress $shippingAddress): RedirectResponse|JsonResponse
+    {
+        $this->ensureOwnership($request, $shippingAddress);
+
+        $request->user()
+            ?->shippingAddresses()
+            ->update(['is_default' => false]);
+
+        $shippingAddress->update(['is_default' => true]);
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'status' => 'Default shipping address updated.',
+                'address_id' => $shippingAddress->id,
+            ]);
+        }
+
+        return redirect()
+            ->route('account.addresses.index')
+            ->with('status', 'Default shipping address updated.');
     }
 
     /**

@@ -3,29 +3,24 @@
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Voidborn Apparel</p>
-            <h1>Dark goods for a sharper catalog.</h1>
+            <h1>Dark goods for a sharper catalog</h1>
             <p class="lead">
-                Voidforge is running with session-based authentication, MariaDB-backed data, and a fuller
-                demo shirt lineup. The storefront now carries the darker visual direction the name calls for,
-                alongside cart, checkout, Stripe, and PayPal approval flows.
+                Voidforge is a dark-themed shirt storefront built for browsing items, managing accounts,
+                checking out with hosted payments, and handling catalog and order operations through an admin area.
             </p>
         </div>
 
-        <div class="actions">
-            <a class="button" href="{{ route('products.index') }}">Browse shirts</a>
-        </div>
-
         <div class="grid two">
-            <div class="card">
+            <div class="card card-plain">
                 <h2>Current stack</h2>
-                <p class="muted">Laravel 13, MariaDB, Docker, session auth, and a seeded t-shirt storefront.</p>
+                <p class="muted">Laravel, MariaDB, Docker, TypeScript, Stripe, and PayPal powering a shirt storefront with account, cart, shipping, checkout, receipts, and admin flows.</p>
             </div>
 
-            <div class="card">
+            <div class="card card-plain">
                 <h2>Security baseline</h2>
-                <p class="muted">CSRF protection, Laravel password hashing, validated auth requests, and server-side sessions.</p>
+                <p class="muted">Validated forms, Laravel auth, CSRF protection, password hashing, hosted payments, and server-side order handling.</p>
             </div>
         </div>
     </section>
+
 @endsection

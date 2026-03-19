@@ -44,7 +44,7 @@ class DashboardTest extends TestCase
             ->get(route('account.addresses.index'))
             ->assertOk()
             ->assertSee('Saved Shipping Addresses')
-            ->assertSee('Add Shipping Address');
+            ->assertSee('Add shipping address');
     }
 
     public function test_my_account_page_shows_the_default_shipping_address_when_available(): void

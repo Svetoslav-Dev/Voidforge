@@ -3,7 +3,6 @@
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Purchase History</p>
             <h1>Your paid and pending shirt receipts.</h1>
             <p class="lead">
                 Review previous checkouts, reopen receipts, and see which payment provider was used for each order.

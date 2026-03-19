@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Storage;
 
 Route::redirect('/', '/products');
 
-Route::view('/welcome', 'welcome')->name('home');
+Route::view('/voidforge-info', 'welcome')->name('home');
 
 Route::get('/media/{path}', function (string $path) {
     abort_unless(Storage::disk('public')->exists($path), 404);
@@ -35,10 +35,13 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/{product}', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::get('/shipping', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::get('/checkout', [CheckoutController::class, 'payment'])->name('checkout.payment');
 Route::get('/checkout/complete', [CheckoutController::class, 'complete'])->name('checkout.complete');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::post('/checkout/address', [CheckoutController::class, 'selectAddress'])->middleware('auth')->name('checkout.address');
+Route::get('/checkout/complete/download', [CheckoutController::class, 'download'])->name('checkout.download');
+Route::post('/shipping', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/shipping/back', [CheckoutController::class, 'back'])->name('checkout.back');
+Route::post('/shipping/address', [CheckoutController::class, 'selectAddress'])->middleware('auth')->name('checkout.address');
 Route::get('/checkout/{order}', [CheckoutController::class, 'show'])->name('checkout.show');
 Route::post('/checkout/{order}/stripe', [StripeCheckoutController::class, 'store'])->name('stripe.checkout.store');
 Route::post('/checkout/{order}/paypal', [PayPalCheckoutController::class, 'store'])->name('paypal.checkout.store');
@@ -62,6 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/account/addresses', [AccountShippingAddressController::class, 'store'])->name('account.addresses.store');
     Route::get('/account/addresses/{shippingAddress}/edit', [AccountShippingAddressController::class, 'edit'])->name('account.addresses.edit');
     Route::patch('/account/addresses/{shippingAddress}', [AccountShippingAddressController::class, 'update'])->name('account.addresses.update');
+    Route::patch('/account/addresses/{shippingAddress}/default', [AccountShippingAddressController::class, 'makeDefault'])->name('account.addresses.default');
     Route::delete('/account/addresses/{shippingAddress}', [AccountShippingAddressController::class, 'destroy'])->name('account.addresses.destroy');
     Route::get('/account/payment-methods', [AccountPaymentMethodController::class, 'index'])->name('account.payment-methods.index');
     Route::post('/account/payment-methods', [AccountPaymentMethodController::class, 'store'])->name('account.payment-methods.store');

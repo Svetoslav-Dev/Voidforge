@@ -3,7 +3,6 @@
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Admin Shirts</p>
             <h1>Manage the storefront lineup.</h1>
             <p class="lead">Create, edit, and archive shirts without touching public routes directly.</p>
         </div>
@@ -11,7 +10,7 @@
         <div class="admin-toolbar">
             <div class="admin-toolbar-left">
                 <a class="button" href="{{ route('admin.products.create') }}">Add shirt</a>
-                <a class="button secondary" href="{{ route('admin.panel') }}">Back to dashboard</a>
+                <a class="button secondary" href="{{ route('admin.panel') }}">Back to admin</a>
             </div>
 
             <form method="GET" action="{{ route('admin.products.index') }}" class="inline-form admin-toolbar-right admin-search">

@@ -14,6 +14,7 @@
 - setup CI/CD jenkins & monitoring for the stie
 - setup paypal for test credentials
 - setup google analytics
+- maybe add Universe on fire video to /voiforge-info ps you have to download it ot mp4
 
 # Final touches
 - Try to make the site public

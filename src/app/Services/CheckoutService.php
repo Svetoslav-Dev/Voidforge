@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +89,39 @@ class CheckoutService
             session()->put('checkout.last_order_email', $order->customer_email);
 
             return $order->load('items');
+        });
+    }
+
+    /**
+     * Reopen a pending checkout by restoring stock and removing the unpaid order.
+     */
+    public function reopenPendingOrder(Order $order): void
+    {
+        if ($order->placed_at !== null || $order->status === 'paid') {
+            return;
+        }
+
+        DB::transaction(function () use ($order): void {
+            $order->loadMissing('items');
+
+            $products = Product::query()
+                ->lockForUpdate()
+                ->whereIn('id', $order->items->pluck('product_id')->filter()->all())
+                ->get()
+                ->keyBy('id');
+
+            /** @var OrderItem $item */
+            foreach ($order->items as $item) {
+                $product = $products->get($item->product_id);
+
+                if ($product) {
+                    $product->increment('stock', $item->quantity);
+                }
+            }
+
+            $order->payments()->delete();
+            $order->items()->delete();
+            $order->delete();
         });
     }
 }

@@ -1,3 +1,10 @@
+import '../css/app.css';
 import './bootstrap';
+import './auth-modal';
+import './account-address-modal';
+import './account-payment-method-modal';
 import './account-delete-confirmation';
+import './checkout-address';
+import './checkout-complete-cards';
+import './product-catalog';
 import './product-gallery';

@@ -32,7 +32,7 @@ class CheckoutTest extends TestCase
 
         $order = Order::query()->with('items')->first();
 
-        $response->assertRedirect(route('checkout.index'));
+        $response->assertRedirect(route('checkout.payment'));
 
         $this->assertNotNull($order);
         $this->assertSame('awaiting_payment', $order->status);
@@ -79,6 +79,36 @@ class CheckoutTest extends TestCase
         $this->assertSame([], session('cart.items', []));
     }
 
+    public function test_paid_checkout_complete_can_download_invoice_pdf(): void
+    {
+        $order = Order::query()->create([
+            'status' => 'paid',
+            'currency' => 'EUR',
+            'subtotal_cents' => 2800,
+            'shipping_cents' => 0,
+            'total_cents' => 2800,
+            'customer_name' => 'Taylor Forge',
+            'customer_email' => 'taylor@example.test',
+            'customer_phone' => '+1-555-0100',
+            'shipping_address_line_1' => '123 Ember Street',
+            'shipping_address_line_2' => 'Unit B',
+            'shipping_city' => 'Ironvale',
+            'shipping_state' => 'CA',
+            'shipping_postal_code' => '90210',
+            'shipping_country' => 'US',
+            'placed_at' => now(),
+        ]);
+
+        $response = $this->withSession([
+            'checkout.last_order_email' => $order->customer_email,
+            'checkout.completed_order_id' => $order->id,
+        ])->get(route('checkout.download'));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+        $response->assertHeader('content-disposition', 'attachment; filename="voidforge-receipt-VF'.$order->id.'.pdf"');
+    }
+
     public function test_unpaid_checkout_show_redirects_back_to_clean_checkout_url(): void
     {
         $order = Order::query()->create([
@@ -105,6 +135,54 @@ class CheckoutTest extends TestCase
             ->assertRedirect(route('products.index'));
     }
 
+    public function test_payment_step_can_go_back_to_address_selection_and_restore_stock(): void
+    {
+        $product = $this->product(stock: 5, priceCents: 2800);
+
+        $order = Order::query()->create([
+            'status' => 'awaiting_payment',
+            'currency' => 'EUR',
+            'subtotal_cents' => 5600,
+            'shipping_cents' => 0,
+            'total_cents' => 5600,
+            'customer_name' => 'Taylor Forge',
+            'customer_email' => 'taylor@example.test',
+            'customer_phone' => '+1-555-0100',
+            'shipping_address_line_1' => '123 Ember Street',
+            'shipping_address_line_2' => 'Unit B',
+            'shipping_city' => 'Ironvale',
+            'shipping_state' => 'CA',
+            'shipping_postal_code' => '90210',
+            'shipping_country' => 'US',
+            'placed_at' => null,
+        ]);
+
+        $order->items()->create([
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'product_sku' => $product->sku,
+            'product_size' => 'L',
+            'unit_price_cents' => $product->price_cents,
+            'quantity' => 2,
+            'line_total_cents' => 5600,
+        ]);
+
+        $product->decrement('stock', 2);
+
+        $this->withSession([
+            'cart.items' => [$product->id.':L' => 2],
+            'checkout.last_order_email' => $order->customer_email,
+            'checkout.pending_order_id' => $order->id,
+        ])->post(route('checkout.back'))
+            ->assertRedirect(route('checkout.index'));
+
+        $this->assertSoftDeleted('orders', [
+            'id' => $order->id,
+        ]);
+        $this->assertSame(5, $product->fresh()->stock);
+        $this->assertSame([$product->id.':L' => 2], session('cart.items', []));
+    }
+
     public function test_authenticated_checkout_links_the_order_to_the_user(): void
     {
         $user = User::factory()->create();
@@ -129,6 +207,54 @@ class CheckoutTest extends TestCase
         $this->get(route('checkout.index'))
             ->assertRedirect(route('cart.index'))
             ->assertSessionHas('status', 'Your cart is empty.');
+    }
+
+    public function test_shipping_page_reopens_pending_checkout_instead_of_redirecting_to_payment(): void
+    {
+        $product = $this->product(stock: 5, priceCents: 2800);
+
+        $order = Order::query()->create([
+            'status' => 'awaiting_payment',
+            'currency' => 'EUR',
+            'subtotal_cents' => 5600,
+            'shipping_cents' => 0,
+            'total_cents' => 5600,
+            'customer_name' => 'Taylor Forge',
+            'customer_email' => 'taylor@example.test',
+            'customer_phone' => '+1-555-0100',
+            'shipping_address_line_1' => '123 Ember Street',
+            'shipping_address_line_2' => 'Unit B',
+            'shipping_city' => 'Ironvale',
+            'shipping_state' => 'CA',
+            'shipping_postal_code' => '90210',
+            'shipping_country' => 'US',
+            'placed_at' => null,
+        ]);
+
+        $order->items()->create([
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'product_sku' => $product->sku,
+            'product_size' => 'L',
+            'unit_price_cents' => $product->price_cents,
+            'quantity' => 2,
+            'line_total_cents' => 5600,
+        ]);
+
+        $product->decrement('stock', 2);
+
+        $this->withSession([
+            'cart.items' => [$product->id.':L' => 2],
+            'checkout.last_order_email' => $order->customer_email,
+            'checkout.pending_order_id' => $order->id,
+        ])->get(route('checkout.index'))
+            ->assertOk();
+
+        $this->assertSoftDeleted('orders', [
+            'id' => $order->id,
+        ]);
+        $this->assertSame(5, $product->fresh()->stock);
+        $this->assertNull(session('checkout.pending_order_id'));
     }
 
     public function test_checkout_fails_when_stock_is_no_longer_available(): void

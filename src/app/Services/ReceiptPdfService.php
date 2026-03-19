@@ -69,37 +69,50 @@ class ReceiptPdfService
     private function receiptLines(Order $order): array
     {
         $lines = [
-            'Voidforge Receipt',
-            'Order #'.$order->id,
+            'VOIDFORGE RECEIPT',
+            '------------------------------',
+            'Order #VF'.$order->id,
             'Placed: '.(optional($order->placed_at)->format('F d, Y H:i') ?? $order->created_at->format('F d, Y H:i')),
-            'Status: '.ucfirst(str_replace('_', ' ', $order->status)),
-            '',
-            'Customer',
-            $order->customer_name,
-            $order->customer_email,
         ];
 
-        if ($order->customer_phone) {
-            $lines[] = $order->customer_phone;
+        $completedPayments = $order->payments->where('status', 'paid');
+
+        if ($completedPayments->isEmpty()) {
+            $lines[] = 'Payment: No completed payment recorded.';
+        } else {
+            foreach ($completedPayments as $payment) {
+                $lines[] = $this->paymentLine($payment);
+            }
         }
 
         $lines[] = '';
-        $lines[] = 'Shipping Address';
-        $lines[] = $order->shipping_address_line_1;
+        $lines[] = 'Customer:';
+        $lines[] = 'Name: '.$order->customer_name;
+        $lines[] = 'Email: '.$order->customer_email;
+
+        if ($order->customer_phone) {
+            $lines[] = 'Phone: '.$order->customer_phone;
+        }
+
+        $lines[] = '';
+        $lines[] = 'Shipping Address:';
+        $lines[] = 'Address: '.$order->shipping_address_line_1;
 
         if ($order->shipping_address_line_2) {
-            $lines[] = $order->shipping_address_line_2;
+            $lines[] = 'Address 2: '.$order->shipping_address_line_2;
         }
 
-        $lines[] = trim(implode(', ', array_filter([
-            $order->shipping_city,
-            $order->shipping_state,
-            $order->shipping_postal_code,
-            $order->shipping_country,
-        ])));
+        $lines[] = 'City: '.$order->shipping_city;
+
+        if ($order->shipping_state) {
+            $lines[] = 'State: '.$order->shipping_state;
+        }
+
+        $lines[] = 'Zip: '.$order->shipping_postal_code;
+        $lines[] = 'Country: '.$order->shipping_country;
 
         $lines[] = '';
-        $lines[] = 'Shirts';
+        $lines[] = 'Shirts:';
 
         foreach ($order->items as $item) {
             $lines[] = sprintf(
@@ -115,16 +128,6 @@ class ReceiptPdfService
         $lines[] = sprintf('Subtotal: %0.2f EUR', $order->subtotal_cents / 100);
         $lines[] = sprintf('Shipping: %0.2f EUR', $order->shipping_cents / 100);
         $lines[] = sprintf('Total: %0.2f EUR', $order->total_cents / 100);
-        $lines[] = '';
-        $lines[] = 'Payments';
-
-        if ($order->payments->isEmpty()) {
-            $lines[] = 'No completed payment recorded.';
-        } else {
-            foreach ($order->payments as $payment) {
-                $lines[] = $this->paymentLine($payment);
-            }
-        }
 
         return $lines;
     }
@@ -153,11 +156,9 @@ class ReceiptPdfService
     private function paymentLine(Payment $payment): string
     {
         return sprintf(
-            '%s | %s | %s | %0.2f EUR',
-            ucfirst($payment->provider),
-            $payment->status,
-            $payment->transaction_id,
-            $payment->amount / 100
+            'Payment: %s | %s',
+            ucfirst($payment->status),
+            ucfirst($payment->provider)
         );
     }
 

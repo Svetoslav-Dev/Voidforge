@@ -3,7 +3,6 @@
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Admin Users</p>
             <h1>Browse users and archive accounts logically.</h1>
             <p class="lead">Archived users stay in the database with `deleted_at`, so order history and receipts remain intact.</p>
         </div>
@@ -11,7 +10,7 @@
         <div class="admin-toolbar">
             <div class="admin-toolbar-left">
                 <a class="button" href="{{ route('admin.users.create') }}">Add new user</a>
-                <a class="button secondary" href="{{ route('admin.panel') }}">Back to dashboard</a>
+                <a class="button secondary" href="{{ route('admin.panel') }}">Back to admin</a>
             </div>
 
             <form method="GET" action="{{ route('admin.users.index') }}" class="inline-form admin-toolbar-right admin-search">

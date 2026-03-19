@@ -181,6 +181,29 @@ class DatabaseSeeder extends Seeder
 
         $this->seedPurchaseHistory($cookie, [
             [
+                'placed_at' => Carbon::parse('2025-03-14 16:10:00'),
+                'status' => 'paid',
+                'currency' => 'EUR',
+                'customer_name' => 'Demo User',
+                'customer_email' => 'demo-user@example.test',
+                'customer_phone' => '+1-555-0142',
+                'shipping_address_line_1' => '42 Quiet Relay Ave',
+                'shipping_address_line_2' => 'Unit 5',
+                'shipping_city' => 'Nightfall',
+                'shipping_state' => 'NY',
+                'shipping_postal_code' => '10001',
+                'shipping_country' => 'BG',
+                'items' => [
+                    ['slug' => 'quiet-signal-tee', 'quantity' => 1],
+                    ['slug' => 'anvil-heavy-tee', 'quantity' => 1],
+                ],
+                'payment' => [
+                    'provider' => 'stripe',
+                    'transaction_id' => 'cs_cookie_20250314',
+                    'status' => 'paid',
+                ],
+            ],
+            [
                 'placed_at' => Carbon::parse('2026-03-10 18:40:00'),
                 'status' => 'paid',
                 'currency' => 'EUR',
@@ -228,6 +251,29 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->seedPurchaseHistory($cookieDestroyer, [
+            [
+                'placed_at' => Carbon::parse('2025-03-22 20:05:00'),
+                'status' => 'paid',
+                'currency' => 'EUR',
+                'customer_name' => 'Demo Admin',
+                'customer_email' => 'demo-admin@example.test',
+                'customer_phone' => '+359-88-100-1000',
+                'shipping_address_line_1' => '99 Void Gate',
+                'shipping_address_line_2' => null,
+                'shipping_city' => 'Sofia',
+                'shipping_state' => 'Sofia City',
+                'shipping_postal_code' => '1000',
+                'shipping_country' => 'BG',
+                'items' => [
+                    ['slug' => 'event-horizon-tee', 'quantity' => 1],
+                    ['slug' => 'forge-mark-tee', 'quantity' => 1],
+                ],
+                'payment' => [
+                    'provider' => 'paypal',
+                    'transaction_id' => 'pp_cookiedestroyer_20250322',
+                    'status' => 'paid',
+                ],
+            ],
             [
                 'placed_at' => Carbon::parse('2026-03-16 19:20:00'),
                 'status' => 'paid',

@@ -40,6 +40,7 @@ class PayPalCheckoutTest extends TestCase
     public function test_paypal_checkout_redirects_back_when_not_configured(): void
     {
         $order = $this->order();
+        $order->forceFill(['placed_at' => null])->save();
 
         $paypal = Mockery::mock(PayPalPaymentService::class);
         $paypal->shouldReceive('isConfigured')->once()->andReturn(false);
@@ -48,8 +49,8 @@ class PayPalCheckoutTest extends TestCase
         $this->withSession([
             'checkout.last_order_email' => $order->customer_email,
         ])->post(route('paypal.checkout.store', $order))
-            ->assertRedirect(route('checkout.complete'))
-            ->assertSessionHasErrors('payment');
+            ->assertRedirect(route('checkout.payment'))
+            ->assertSessionHas('status', 'PayPal is not configured for this environment yet.');
     }
 
     public function test_paypal_return_captures_the_order_and_redirects_to_confirmation(): void

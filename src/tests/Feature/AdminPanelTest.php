@@ -36,11 +36,51 @@ class AdminPanelTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
 
+        Order::query()->create([
+            'status' => 'paid',
+            'currency' => 'EUR',
+            'subtotal_cents' => 2800,
+            'shipping_cents' => 0,
+            'total_cents' => 2800,
+            'customer_name' => 'Taylor Forge',
+            'customer_email' => 'taylor@example.test',
+            'customer_phone' => '+1-555-0100',
+            'shipping_address_line_1' => '123 Ember Street',
+            'shipping_address_line_2' => 'Unit B',
+            'shipping_city' => 'Ironvale',
+            'shipping_state' => 'CA',
+            'shipping_postal_code' => '90210',
+            'shipping_country' => 'US',
+            'placed_at' => now()->startOfYear()->addMonths(1),
+        ]);
+
+        Order::query()->create([
+            'status' => 'paid',
+            'currency' => 'EUR',
+            'subtotal_cents' => 1900,
+            'shipping_cents' => 0,
+            'total_cents' => 1900,
+            'customer_name' => 'Taylor Forge',
+            'customer_email' => 'taylor@example.test',
+            'customer_phone' => '+1-555-0100',
+            'shipping_address_line_1' => '123 Ember Street',
+            'shipping_address_line_2' => 'Unit B',
+            'shipping_city' => 'Ironvale',
+            'shipping_state' => 'CA',
+            'shipping_postal_code' => '90210',
+            'shipping_country' => 'US',
+            'placed_at' => now()->startOfYear()->subYear()->addMonths(1),
+        ]);
+
         $this->actingAs($admin)
             ->get(route('admin.panel'))
             ->assertOk()
-            ->assertSee('Browse shirts, catalogs, users, and review orders.')
-            ->assertSee('Catalogs');
+            ->assertSee('Command the void across shirts, catalogs, users, and orders.')
+            ->assertSee('Catalogs')
+            ->assertSee('Revenue this year')
+            ->assertSee((string) now()->year)
+            ->assertSee((string) now()->subYear()->year)
+            ->assertSee('Feb');
     }
 
     public function test_admin_can_open_my_account_page(): void

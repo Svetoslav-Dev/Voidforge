@@ -52,7 +52,7 @@ class OrderHistoryController extends Controller
 
         return response($pdf, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="voidforge-receipt-'.$order->id.'.pdf"',
+            'Content-Disposition' => 'attachment; filename="voidforge-receipt-VF'.$order->id.'.pdf"',
         ]);
     }
 

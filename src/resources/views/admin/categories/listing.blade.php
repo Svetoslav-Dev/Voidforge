@@ -11,7 +11,7 @@
         <div class="admin-toolbar">
             <div class="admin-toolbar-left">
                 <a class="button" href="{{ route('admin.categories.create') }}">Add catalog</a>
-                <a class="button secondary" href="{{ route('admin.panel') }}">Back to dashboard</a>
+                <a class="button secondary" href="{{ route('admin.panel') }}">Back to admin</a>
             </div>
 
             <form method="GET" action="{{ route('admin.categories.index') }}" class="inline-form admin-toolbar-right admin-search">

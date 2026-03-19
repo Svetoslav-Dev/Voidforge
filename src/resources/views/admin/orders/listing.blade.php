@@ -3,14 +3,13 @@
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Admin Orders</p>
             <h1>Review customer orders.</h1>
             <p class="lead">This view keeps order oversight simple: status, customer, total, and a drill-down page.</p>
         </div>
 
         <div class="admin-toolbar">
             <div class="admin-toolbar-left">
-                <a class="button secondary" href="{{ route('admin.panel') }}">Back to dashboard</a>
+                <a class="button secondary" href="{{ route('admin.panel') }}">Back to admin</a>
             </div>
 
             <form method="GET" action="{{ route('admin.orders.index') }}" class="inline-form admin-toolbar-right admin-search">

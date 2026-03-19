@@ -20,6 +20,9 @@ class DashboardController extends Controller
             'defaultShippingAddress' => $user?->shippingAddresses()
                 ->where('is_default', true)
                 ->first(),
+            'defaultSavedCard' => $user?->savedPaymentMethods()
+                ->where('is_default', true)
+                ->first(),
         ]);
     }
 

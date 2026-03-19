@@ -6,9 +6,11 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 use App\Models\Order;
 use App\Services\CartService;
 use App\Services\CheckoutService;
+use App\Services\ReceiptPdfService;
 use App\Services\StripePaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -16,7 +18,12 @@ class CheckoutController extends Controller
     /**
      * Display the checkout page.
      */
-    public function index(Request $request, CartService $cart, StripePaymentService $stripe): View|RedirectResponse
+    public function index(
+        Request $request,
+        CartService $cart,
+        StripePaymentService $stripe,
+        CheckoutService $checkout
+    ): View|RedirectResponse
     {
         if ($request->query('stripe') === 'success' && filled($request->query('session_id'))) {
             $order = $stripe->completeCheckoutPayment((string) $request->query('session_id'));
@@ -30,7 +37,7 @@ class CheckoutController extends Controller
             }
 
             return redirect()
-                ->route('checkout.index')
+                ->route('checkout.payment')
                 ->withErrors([
                     'payment' => 'Stripe payment could not be confirmed.',
                 ]);
@@ -38,16 +45,15 @@ class CheckoutController extends Controller
 
         if ($request->query('stripe') === 'cancelled') {
             return redirect()
-                ->route('checkout.index')
+                ->route('checkout.payment')
                 ->with('status', 'Stripe checkout was cancelled.');
         }
 
         $pendingOrder = $this->pendingOrderFromSession($request);
 
         if ($pendingOrder && $pendingOrder->placed_at === null) {
-            return view('checkout.confirmation', [
-                'order' => $pendingOrder->load('items'),
-            ]);
+            $checkout->reopenPendingOrder($pendingOrder);
+            $request->session()->forget('checkout.pending_order_id');
         }
 
         if ($cart->items()->isEmpty()) {
@@ -115,6 +121,46 @@ class CheckoutController extends Controller
     }
 
     /**
+     * Display the unpaid payment step on its dedicated route.
+     */
+    public function payment(Request $request, StripePaymentService $stripe): View|RedirectResponse
+    {
+        if ($request->query('stripe') === 'success' && filled($request->query('session_id'))) {
+            $order = $stripe->completeCheckoutPayment((string) $request->query('session_id'));
+
+            if ($order) {
+                $request->session()->put('checkout.completed_order_id', $order->id);
+
+                return redirect()
+                    ->route('checkout.complete')
+                    ->with('status', 'Stripe payment processed.');
+            }
+
+            return redirect()
+                ->route('checkout.payment')
+                ->withErrors([
+                    'payment' => 'Stripe payment could not be confirmed.',
+                ]);
+        }
+
+        if ($request->query('stripe') === 'cancelled') {
+            return redirect()
+                ->route('checkout.payment')
+                ->with('status', 'Stripe checkout was cancelled.');
+        }
+
+        $pendingOrder = $this->pendingOrderFromSession($request);
+
+        if (! $pendingOrder || $pendingOrder->placed_at !== null) {
+            return redirect()->route('checkout.index');
+        }
+
+        return view('checkout.confirmation', [
+            'order' => $pendingOrder->load('items'),
+        ]);
+    }
+
+    /**
      * Store the selected saved shipping address in the session.
      */
     public function selectAddress(Request $request): RedirectResponse
@@ -139,6 +185,21 @@ class CheckoutController extends Controller
     {
         $order = $checkout->placeOrder($request->validated(), $request->user());
         $request->session()->put('checkout.pending_order_id', $order->id);
+
+        return redirect()->route('checkout.payment');
+    }
+
+    /**
+     * Return from the payment step to address selection.
+     */
+    public function back(Request $request, CheckoutService $checkout): RedirectResponse
+    {
+        $pendingOrder = $this->pendingOrderFromSession($request);
+
+        if ($pendingOrder && $pendingOrder->placed_at === null) {
+            $checkout->reopenPendingOrder($pendingOrder);
+            $request->session()->forget('checkout.pending_order_id');
+        }
 
         return redirect()->route('checkout.index');
     }
@@ -165,6 +226,27 @@ class CheckoutController extends Controller
 
         return view('checkout.confirmation', [
             'order' => $order->load('items'),
+        ]);
+    }
+
+    /**
+     * Download the completed checkout invoice as a PDF.
+     */
+    public function download(Request $request, ReceiptPdfService $pdfs): Response|RedirectResponse
+    {
+        $completedOrderId = (int) $request->session()->get('checkout.completed_order_id', 0);
+        $order = $completedOrderId > 0 ? Order::query()->find($completedOrderId) : null;
+
+        if (! $order || ! $this->canAccessOrder($request, $order) || $order->placed_at === null) {
+            return redirect()->route('products.index');
+        }
+
+        $order->load(['items.product', 'payments']);
+        $pdf = $pdfs->render($order);
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="voidforge-receipt-VF'.$order->id.'.pdf"',
         ]);
     }
 
