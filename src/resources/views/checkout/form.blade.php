@@ -180,9 +180,15 @@
                     <span>Shipping</span>
                     <strong>0.00 EUR</strong>
                 </p>
+                @if ($discountSummary)
+                    <p class="summary-line plain-line">
+                        <span>Discount · {{ $discountSummary['code'] }}</span>
+                        <strong>-{{ number_format($discountSummary['discount_cents'] / 100, 2) }} EUR</strong>
+                    </p>
+                @endif
                 <p class="summary-line total-line">
                     <span>Total</span>
-                    <strong>{{ number_format($subtotalCents / 100, 2) }} EUR</strong>
+                    <strong>{{ number_format(($discountSummary['total_cents'] ?? $subtotalCents) / 100, 2) }} EUR</strong>
                 </p>
                 <p class="muted">Payment is not collected yet. Stripe and PayPal are the next steps.</p>
             </aside>

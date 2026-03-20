@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\DiscountCode;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -112,6 +113,33 @@ class CartTest extends TestCase
 
         $response->assertSessionHasErrors('size');
         $this->assertSame([], session('cart.items', []));
+    }
+
+    public function test_a_discount_code_can_be_applied_and_removed_from_the_cart(): void
+    {
+        $product = $this->product();
+        DiscountCode::query()->create([
+            'code' => 'WELCOME10',
+            'type' => 'percent',
+            'amount' => 10,
+            'is_active' => true,
+        ]);
+
+        $this->withSession([
+            'cart.items' => [$product->id.':M' => 2],
+        ])->post(route('cart.discount.store'), [
+            'code' => 'welcome10',
+        ])->assertRedirect(route('cart.index'));
+
+        $this->assertSame('WELCOME10', session('cart.discount_code'));
+
+        $this->withSession([
+            'cart.items' => [$product->id.':M' => 2],
+            'cart.discount_code' => 'WELCOME10',
+        ])->delete(route('cart.discount.destroy'))
+            ->assertRedirect(route('cart.index'));
+
+        $this->assertNull(session('cart.discount_code'));
     }
 
     private function product(int $stock = 25): Product

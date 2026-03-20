@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\DiscountCode;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ShippingAddress;
@@ -45,6 +46,31 @@ class CheckoutTest extends TestCase
         $this->assertCount(1, $order->items);
         $this->assertSame('Forge Mark Tee', $order->items->first()->product_name);
         $this->assertSame('L', $order->items->first()->product_size);
+    }
+
+    public function test_checkout_applies_the_current_discount_code_to_the_order(): void
+    {
+        $product = $this->product(stock: 5, priceCents: 2800);
+        $discountCode = DiscountCode::query()->create([
+            'code' => 'WELCOME10',
+            'type' => 'percent',
+            'amount' => 10,
+            'is_active' => true,
+        ]);
+
+        $this->withSession([
+            'cart.items' => [$product->id.':L' => 2],
+            'cart.discount_code' => $discountCode->code,
+        ])->post(route('checkout.store'), $this->checkoutPayload())
+            ->assertRedirect(route('checkout.payment'));
+
+        $order = Order::query()->firstOrFail();
+
+        $this->assertSame($discountCode->id, $order->discount_code_id);
+        $this->assertSame('WELCOME10', $order->discount_code);
+        $this->assertSame(560, $order->discount_cents);
+        $this->assertSame(5040, $order->total_cents);
+        $this->assertSame(1, $discountCode->fresh()->times_used);
     }
 
     public function test_paid_checkout_show_clears_the_cart_for_the_same_session(): void

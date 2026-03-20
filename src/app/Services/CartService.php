@@ -155,6 +155,7 @@ class CartService
     public function clear(): void
     {
         session()->forget(self::SESSION_KEY);
+        session()->forget('cart.discount_code');
     }
 
     /**

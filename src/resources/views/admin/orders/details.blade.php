@@ -23,6 +23,9 @@
             <h2>Totals</h2>
             <p class="muted">Subtotal: {{ number_format($order->subtotal_cents / 100, 2) }} EUR</p>
             <p class="muted">Shipping: {{ number_format($order->shipping_cents / 100, 2) }} EUR</p>
+            @if ($order->discount_cents > 0)
+                <p class="muted">Discount: -{{ number_format($order->discount_cents / 100, 2) }} EUR ({{ $order->discount_code }})</p>
+            @endif
             <p><strong>Total: {{ number_format($order->total_cents / 100, 2) }} EUR</strong></p>
         </article>
     </section>

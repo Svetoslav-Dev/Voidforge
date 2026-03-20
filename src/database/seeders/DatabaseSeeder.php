@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\DiscountCode;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
@@ -178,6 +179,30 @@ class DatabaseSeeder extends Seeder
                 $productData + ['category_id' => $category->id]
             );
         }
+
+        DiscountCode::query()->updateOrCreate(
+            ['code' => 'WELCOME10'],
+            [
+                'description' => '10% off the first void run.',
+                'type' => 'percent',
+                'amount' => 10,
+                'is_active' => true,
+                'usage_limit' => null,
+                'expires_at' => null,
+            ]
+        );
+
+        DiscountCode::query()->updateOrCreate(
+            ['code' => 'VOID5'],
+            [
+                'description' => '5 EUR off any shirt order.',
+                'type' => 'fixed',
+                'amount' => 500,
+                'is_active' => true,
+                'usage_limit' => null,
+                'expires_at' => null,
+            ]
+        );
 
         $this->seedPurchaseHistory($cookie, [
             [

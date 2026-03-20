@@ -12,7 +12,8 @@ use Illuminate\Validation\ValidationException;
 class CheckoutService
 {
     public function __construct(
-        private readonly CartService $cart
+        private readonly CartService $cart,
+        private readonly DiscountCodeService $discountCodes
     ) {
     }
 
@@ -57,15 +58,20 @@ class CheckoutService
             }
 
             $subtotalCents = (int) $items->sum('line_total_cents');
+            $discountCode = $this->discountCodes->reserveCurrent($subtotalCents);
+            $discountCents = $discountCode?->discountCentsFor($subtotalCents) ?? 0;
 
             $order = Order::query()->create([
                 ...$customerData,
                 'user_id' => $user?->id,
+                'discount_code_id' => $discountCode?->id,
                 'status' => 'awaiting_payment',
                 'currency' => 'EUR',
                 'subtotal_cents' => $subtotalCents,
                 'shipping_cents' => 0,
-                'total_cents' => $subtotalCents,
+                'discount_code' => $discountCode?->code,
+                'discount_cents' => $discountCents,
+                'total_cents' => max(0, $subtotalCents - $discountCents),
                 'placed_at' => null,
             ]);
 
@@ -84,6 +90,10 @@ class CheckoutService
                 ]);
 
                 $product->decrement('stock', $item['quantity']);
+            }
+
+            if ($discountCode) {
+                session()->put('cart.discount_code', $discountCode->code);
             }
 
             session()->put('checkout.last_order_email', $order->customer_email);
@@ -117,6 +127,11 @@ class CheckoutService
                 if ($product) {
                     $product->increment('stock', $item->quantity);
                 }
+            }
+
+            $this->discountCodes->release($order->discountCodeModel);
+            if ($order->discount_code) {
+                session()->put('cart.discount_code', $order->discount_code);
             }
 
             $order->payments()->delete();

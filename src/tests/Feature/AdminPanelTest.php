@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\DiscountCode;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -75,7 +76,7 @@ class AdminPanelTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.panel'))
             ->assertOk()
-            ->assertSee('Command the void across shirts, catalogs, users, and orders.')
+            ->assertSee('Rule the void storefront')
             ->assertSee('Catalogs')
             ->assertSee('Revenue this year')
             ->assertSee((string) now()->year)
@@ -113,6 +114,54 @@ class AdminPanelTest extends TestCase
         $this->assertDatabaseHas('products', [
             'slug' => 'admin-item',
             'sku' => 'VF-ADMIN-001',
+        ]);
+    }
+
+    public function test_admin_can_create_a_discount_code(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->post(route('admin.discount-codes.store'), [
+                'code' => 'VOID10',
+                'description' => 'Ten percent off.',
+                'type' => 'percent',
+                'amount' => 10,
+                'is_active' => 1,
+            ])->assertRedirect();
+
+        $this->assertDatabaseHas('discount_codes', [
+            'code' => 'VOID10',
+            'type' => 'percent',
+            'amount' => 10,
+        ]);
+    }
+
+    public function test_admin_can_update_a_discount_code(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $discountCode = DiscountCode::query()->create([
+            'code' => 'VOID5',
+            'description' => 'Five off',
+            'type' => 'fixed',
+            'amount' => 500,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.discount-codes.update', $discountCode), [
+                'code' => 'VOID15',
+                'description' => 'Fifteen percent off.',
+                'type' => 'percent',
+                'amount' => 15,
+                'is_active' => 1,
+            ])->assertRedirect();
+
+        $this->assertDatabaseHas('discount_codes', [
+            'id' => $discountCode->id,
+            'code' => 'VOID15',
+            'type' => 'percent',
+            'amount' => 15,
         ]);
     }
 

@@ -127,6 +127,9 @@ class ReceiptPdfService
         $lines[] = '';
         $lines[] = sprintf('Subtotal: %0.2f EUR', $order->subtotal_cents / 100);
         $lines[] = sprintf('Shipping: %0.2f EUR', $order->shipping_cents / 100);
+        if ($order->discount_cents > 0) {
+            $lines[] = sprintf('Discount (%s): -%0.2f EUR', $order->discount_code, $order->discount_cents / 100);
+        }
         $lines[] = sprintf('Total: %0.2f EUR', $order->total_cents / 100);
 
         return $lines;

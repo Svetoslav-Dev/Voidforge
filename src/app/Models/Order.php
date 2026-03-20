@@ -19,10 +19,13 @@ class Order extends Model
      */
     protected $fillable = [
         'user_id',
+        'discount_code_id',
         'status',
         'currency',
         'subtotal_cents',
         'shipping_cents',
+        'discount_code',
+        'discount_cents',
         'total_cents',
         'customer_name',
         'customer_email',
@@ -56,6 +59,11 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function discountCodeModel(): BelongsTo
+    {
+        return $this->belongsTo(DiscountCode::class, 'discount_code_id');
     }
 
     /**

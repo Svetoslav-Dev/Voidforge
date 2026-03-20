@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminPanelController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminDiscountCodeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CheckoutController;
@@ -32,6 +33,8 @@ Route::get('/media/{path}', function (string $path) {
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/discount', [CartController::class, 'applyDiscount'])->name('cart.discount.store');
+Route::delete('/cart/discount', [CartController::class, 'removeDiscount'])->name('cart.discount.destroy');
 Route::post('/cart/{product}', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
@@ -98,6 +101,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     Route::patch('/users/{user}/restore', [AdminUserController::class, 'restore'])->name('users.restore');
+    Route::get('/discount-codes', [AdminDiscountCodeController::class, 'index'])->name('discount-codes.index');
+    Route::get('/discount-codes/create', [AdminDiscountCodeController::class, 'create'])->name('discount-codes.create');
+    Route::post('/discount-codes', [AdminDiscountCodeController::class, 'store'])->name('discount-codes.store');
+    Route::get('/discount-codes/{discountCode}/edit', [AdminDiscountCodeController::class, 'edit'])->name('discount-codes.edit');
+    Route::patch('/discount-codes/{discountCode}', [AdminDiscountCodeController::class, 'update'])->name('discount-codes.update');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');

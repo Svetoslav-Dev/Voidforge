@@ -11,6 +11,7 @@
             <a class="button secondary" href="{{ route('admin.products.index') }}">Browse shirts</a>
             <a class="button secondary" href="{{ route('admin.categories.index') }}">Browse catalogs</a>
             <a class="button secondary" href="{{ route('admin.users.index') }}">Browse users</a>
+            <a class="button secondary" href="{{ route('admin.discount-codes.index') }}">Browse discounts</a>
             <a class="button secondary" href="{{ route('admin.orders.index') }}">Browse orders</a>
         </div>
     </section>
@@ -29,6 +30,11 @@
         <article class="card">
             <h2>Users</h2>
             <p class="muted">{{ $userCount }} active users with {{ $archivedUserCount }} archived.</p>
+        </article>
+
+        <article class="card">
+            <h2>Discounts</h2>
+            <p class="muted">{{ $discountCodeCount }} discount codes available for carts and checkout.</p>
         </article>
 
         <article class="card">

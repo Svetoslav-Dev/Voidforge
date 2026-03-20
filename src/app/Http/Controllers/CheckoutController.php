@@ -6,6 +6,7 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 use App\Models\Order;
 use App\Services\CartService;
 use App\Services\CheckoutService;
+use App\Services\DiscountCodeService;
 use App\Services\ReceiptPdfService;
 use App\Services\StripePaymentService;
 use Illuminate\Http\RedirectResponse;
@@ -21,6 +22,7 @@ class CheckoutController extends Controller
     public function index(
         Request $request,
         CartService $cart,
+        DiscountCodeService $discountCodes,
         StripePaymentService $stripe,
         CheckoutService $checkout
     ): View|RedirectResponse
@@ -112,6 +114,7 @@ class CheckoutController extends Controller
         return view('checkout.form', [
             'items' => $cart->items(),
             'subtotalCents' => $cart->subtotalCents(),
+            'discountSummary' => $discountCodes->summary($cart->subtotalCents()),
             'europeanCountries' => StoreCheckoutRequest::europeanCountries(),
             'checkoutDefaults' => $addressDefaults,
             'shippingAddresses' => $shippingAddresses,

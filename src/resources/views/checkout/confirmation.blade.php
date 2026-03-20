@@ -74,6 +74,16 @@
                 </p>
             @endforeach
             <p class="summary-line plain-line">
+                <span>Subtotal</span>
+                <strong>{{ number_format($order->subtotal_cents / 100, 2) }} EUR</strong>
+            </p>
+            @if ($order->discount_cents > 0)
+                <p class="summary-line plain-line">
+                    <span>Discount · {{ $order->discount_code }}</span>
+                    <strong>-{{ number_format($order->discount_cents / 100, 2) }} EUR</strong>
+                </p>
+            @endif
+            <p class="summary-line plain-line">
                 <span>Status</span>
                 <strong>{{ ucwords(str_replace('_', ' ', $order->status)) }}</strong>
             </p>
