@@ -18,7 +18,15 @@ services:
       APP_ENV: ${APP_ENV:-local}
       APP_DEBUG: ${APP_DEBUG:-true}
       APP_URL: ${APP_URL:-https://localhost:${APP_HTTPS_PORT:-8443}}
+      APP_PORT: ${APP_PORT:-8000}
+      APP_HTTPS_PORT: ${APP_HTTPS_PORT:-8443}
       TMPDIR: /var/www/html/storage/tmp
+      CERT_MODE: ${CERT_MODE:-self-signed}
+      CERT_DOMAIN: ${CERT_DOMAIN:-localhost}
+      CERT_SERVER_NAMES: ${CERT_SERVER_NAMES:-localhost 127.0.0.1}
+      CERT_ALT_NAMES: ${CERT_ALT_NAMES:-DNS:localhost,IP:127.0.0.1}
+      CERT_CRT_PATH: ${CERT_CRT_PATH:-}
+      CERT_KEY_PATH: ${CERT_KEY_PATH:-}
       DB_CONNECTION: mariadb
       DB_HOST: db
       DB_PORT: 3306
