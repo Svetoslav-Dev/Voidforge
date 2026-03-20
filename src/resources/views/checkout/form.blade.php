@@ -170,6 +170,17 @@
 
             <aside class="card summary-card checkout-shipping-summary-card">
                 <p class="checkout-order-summary-title">Order summary:</p>
+                <form method="POST" action="{{ route('cart.discount.store') }}">
+                    @csrf
+                    <div class="field" style="margin-bottom: 0.5rem;">
+                        <label for="shipping_discount_code">Discount code</label>
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <input id="shipping_discount_code" name="code" type="text" value="{{ old('code', $discountSummary['code'] ?? '') }}" placeholder="WELCOME10">
+                            <button type="submit">Apply</button>
+                        </div>
+                        @error('code')<p class="muted">{{ $message }}</p>@enderror
+                    </div>
+                </form>
                 @foreach ($items as $item)
                     <p class="summary-line plain-line">
                         <span>{{ $item['product']->name }} · {{ $item['size'] }} x {{ $item['quantity'] }}</span>
@@ -181,11 +192,23 @@
                     <strong>0.00 EUR</strong>
                 </p>
                 @if ($discountSummary)
-                    <p class="summary-line plain-line">
+                    <div class="actions" style="margin-top: 0;">
+                        <p class="discount-applied-label" style="margin:0;">Applied code {{ $discountSummary['code'] }}</p>
+                        <form method="POST" action="{{ route('cart.discount.destroy') }}">
+                            @csrf
+                            @method('DELETE')
+                            <button class="button danger" type="submit">Remove</button>
+                        </form>
+                    </div>
+                    <p class="summary-line plain-line discount-summary-line">
                         <span>Discount · {{ $discountSummary['code'] }}</span>
                         <strong>-{{ number_format($discountSummary['discount_cents'] / 100, 2) }} EUR</strong>
                     </p>
                 @endif
+                <p class="summary-line plain-line">
+                    <span>Subtotal</span>
+                    <strong>{{ number_format($subtotalCents / 100, 2) }} EUR</strong>
+                </p>
                 <p class="summary-line total-line">
                     <span>Total</span>
                     <strong>{{ number_format(($discountSummary['total_cents'] ?? $subtotalCents) / 100, 2) }} EUR</strong>

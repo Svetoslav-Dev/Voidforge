@@ -42,6 +42,20 @@ class CartTest extends TestCase
             ->assertSee('56.00 EUR');
     }
 
+    public function test_a_product_can_be_added_to_the_cart_via_ajax(): void
+    {
+        $product = $this->product();
+
+        $this->postJson(route('cart.store', $product), [
+            'quantity' => 1,
+            'size' => 'M',
+        ])->assertCreated()
+            ->assertJson([
+                'status' => 'Forge Mark Tee added to cart.',
+                'item_count' => 1,
+            ]);
+    }
+
     public function test_a_cart_item_quantity_can_be_updated(): void
     {
         $product = $this->product();

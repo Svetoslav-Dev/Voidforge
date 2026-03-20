@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SavedPaymentMethod;
 use App\Services\StripePaymentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -56,13 +57,20 @@ class AccountPaymentMethodController extends Controller
     /**
      * Mark a saved card as the default one for the account.
      */
-    public function makeDefault(Request $request, SavedPaymentMethod $paymentMethod): RedirectResponse
+    public function makeDefault(Request $request, SavedPaymentMethod $paymentMethod): RedirectResponse|JsonResponse
     {
         $this->ensureOwnership($request, $paymentMethod);
 
         $request->user()->savedPaymentMethods()->update(['is_default' => false]);
 
         $paymentMethod->update(['is_default' => true]);
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'status' => 'Default card updated.',
+                'payment_method_id' => $paymentMethod->id,
+            ]);
+        }
 
         return redirect()
             ->route('account.payment-methods.index')

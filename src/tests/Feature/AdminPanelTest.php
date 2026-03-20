@@ -122,6 +122,11 @@ class AdminPanelTest extends TestCase
         $admin = User::factory()->admin()->create();
 
         $this->actingAs($admin)
+            ->get(route('admin.discount-codes.create'))
+            ->assertOk()
+            ->assertSee('Create discount code');
+
+        $this->actingAs($admin)
             ->post(route('admin.discount-codes.store'), [
                 'code' => 'VOID10',
                 'description' => 'Ten percent off.',

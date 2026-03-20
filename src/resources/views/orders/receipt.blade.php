@@ -1,11 +1,13 @@
-@extends('layouts.app', ['title' => 'Order #VF'.$order->id.' | Voidforge'])
+@extends('layouts.app', ['title' => ($order->placed_at ? 'Order #VF' : 'Pending Order #VF').$order->id.' | Voidforge'])
 
 @section('content')
     <section class="card hero">
         <div class="receipt-header">
             <div>
-                <p class="muted">{{ $order->placed_at ? 'Receipt' : 'Pending Order' }}</p>
-                <h1>Order #VF{{ $order->id }}</h1>
+                @if ($order->placed_at)
+                    <p class="muted">Receipt</p>
+                @endif
+                <h1>{{ $order->placed_at ? 'Order' : 'Pending Order' }} #VF{{ $order->id }}</h1>
                 <p class="lead">
                     @if ($order->placed_at)
                         Purchased by {{ $order->customer_name }} on
@@ -17,8 +19,9 @@
             </div>
 
             <div style="text-align: right;">
-                <p class="muted">Status</p>
-                <h2 style="margin: 0;">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</h2>
+                <h2 class="{{ $order->status === 'awaiting_payment' ? 'pending-order-status' : '' }}" style="margin: 0;">
+                    {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                </h2>
                 <div class="actions" style="justify-content: flex-end;">
                     <a class="button secondary" href="{{ route('orders.index') }}">Back to receipt history</a>
                 </div>
@@ -47,7 +50,7 @@
                 <strong>{{ number_format($order->subtotal_cents / 100, 2) }} EUR</strong>
             </p>
             @if ($order->discount_cents > 0)
-                <p class="summary-line plain-line">
+                <p class="summary-line plain-line receipt-discount-line">
                     <span>Discount · {{ $order->discount_code }}</span>
                     <strong>-{{ number_format($order->discount_cents / 100, 2) }} EUR</strong>
                 </p>

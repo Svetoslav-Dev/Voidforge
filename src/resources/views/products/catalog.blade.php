@@ -52,7 +52,7 @@
                                         <a class="button secondary" href="{{ route('products.show', $product) }}">View shirt</a>
 
                                         @if ($product->stock > 0 && $product->defaultShirtSize())
-                                            <form method="POST" action="{{ route('cart.store', $product) }}">
+                                            <form method="POST" action="{{ route('cart.store', $product) }}" data-ajax-add-to-cart>
                                                 @csrf
                                                 <input type="hidden" name="quantity" value="1">
                                                 <input type="hidden" name="size" value="{{ $product->defaultShirtSize() }}">

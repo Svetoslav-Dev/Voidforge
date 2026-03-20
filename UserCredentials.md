@@ -15,3 +15,9 @@ Local demo accounts that should exist after the standard project setup and seedi
 - Password: `DemoPass123!`
 
 This regular user is seeded with demo purchase history / receipts.
+
+## Discount codes
+- WELCOME10
+    10% off
+- VOID5
+    5.00 EUR off

@@ -32,7 +32,12 @@
                             {{ $discountCode->type === \App\Models\DiscountCode::TYPE_PERCENT ? $discountCode->amount.'% off' : number_format($discountCode->amount / 100, 2).' EUR off' }}
                             · {{ $discountCode->is_active ? 'Active' : 'Inactive' }}
                         </p>
-                        <p class="muted">Used {{ $discountCode->times_used }} times@if($discountCode->usage_limit) / {{ $discountCode->usage_limit }}@endif</p>
+                        <p class="muted">
+                            Used {{ $discountCode->times_used }} times
+                            @if ($discountCode->usage_limit)
+                                / {{ $discountCode->usage_limit }}
+                            @endif
+                        </p>
                         @if ($discountCode->expires_at)
                             <p class="muted">Expires {{ $discountCode->expires_at->format('F d, Y H:i') }}</p>
                         @endif

@@ -27,25 +27,29 @@
 
         <section class="account-address-grid">
             @forelse ($paymentMethods as $paymentMethod)
-                <article class="card account-address-card">
+                <article class="card account-address-card" data-payment-method-card data-payment-method-id="{{ $paymentMethod->id }}">
                     <p style="margin: 0 0 0.3rem; font-weight: 700;">
                         {{ strtoupper($paymentMethod->brand ?? 'Card') }} ending in {{ $paymentMethod->last4 ?? '----' }}
-                        @if ($paymentMethod->is_default)
-                            <span style="color: #ffb86b;">· Default</span>
-                        @endif
+                        <span
+                            data-payment-method-default-badge
+                            style="color: #ffb86b;{{ $paymentMethod->is_default ? '' : ' display:none;' }}"
+                        >· Default</span>
                     </p>
                     <p class="muted" style="margin: 0;">
                         Expires {{ str_pad((string) ($paymentMethod->exp_month ?? 0), 2, '0', STR_PAD_LEFT) }}/{{ $paymentMethod->exp_year ?? '----' }}
                     </p>
                     <p class="muted" style="margin: 0;">Provider: {{ strtoupper($paymentMethod->provider) }}</p>
                     <div class="actions" style="margin-top: auto;">
-                        @unless ($paymentMethod->is_default)
-                            <form method="POST" action="{{ route('account.payment-methods.default', $paymentMethod) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button class="button secondary address-default-button" type="submit">Set as default</button>
-                            </form>
-                        @endunless
+                        <form
+                            method="POST"
+                            action="{{ route('account.payment-methods.default', $paymentMethod) }}"
+                            data-payment-method-default-form
+                            {{ $paymentMethod->is_default ? 'hidden' : '' }}
+                        >
+                            @csrf
+                            @method('PATCH')
+                            <button class="button secondary address-default-button" type="submit">Set as default</button>
+                        </form>
 
                         <button
                             type="button"

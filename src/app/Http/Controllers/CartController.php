@@ -8,6 +8,7 @@ use App\Http\Requests\Cart\UpdateCartItemRequest;
 use App\Models\Product;
 use App\Services\CartService;
 use App\Services\DiscountCodeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -39,7 +40,7 @@ class CartController extends Controller
     /**
      * Add a product to the cart.
      */
-    public function store(AddToCartRequest $request, Product $product): RedirectResponse
+    public function store(AddToCartRequest $request, Product $product): RedirectResponse|JsonResponse
     {
         $this->cart->add(
             $product,
@@ -47,9 +48,18 @@ class CartController extends Controller
             (int) $request->validated('quantity')
         );
 
+        $status = $product->name.' added to cart.';
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'status' => $status,
+                'item_count' => $this->cart->itemCount(),
+            ], 201);
+        }
+
         return redirect()
             ->back()
-            ->with('status', $product->name.' added to cart.');
+            ->with('status', $status);
     }
 
     /**

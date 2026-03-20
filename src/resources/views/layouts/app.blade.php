@@ -18,7 +18,7 @@
     <body>
         <div class="shell">
             <nav class="nav">
-                <div class="nav-group">
+                <div class="nav-group" data-nav-group>
                     <a class="brand" href="{{ route('home') }}">
                         <span class="brand-mark" aria-hidden="true"></span>
                         <span class="brand-text">Voidforge</span>
@@ -33,7 +33,7 @@
                         @endif
                     @endauth
                     @if (($cartItemCount ?? 0) > 0)
-                        <a class="button secondary" href="{{ route('cart.index') }}">Cart ({{ $cartItemCount }})</a>
+                        <a class="button secondary" href="{{ route('cart.index') }}" data-cart-link>Cart ({{ $cartItemCount }})</a>
                     @endif
                 </div>
 

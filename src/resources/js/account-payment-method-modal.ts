@@ -50,4 +50,54 @@ const bindPaymentMethodDeleteModal = (): void => {
     });
 };
 
-document.addEventListener('DOMContentLoaded', bindPaymentMethodDeleteModal);
+const bindPaymentMethodDefaultForms = (): void => {
+    const defaultForms = Array.from(
+        document.querySelectorAll<HTMLFormElement>('[data-payment-method-default-form]')
+    );
+
+    if (defaultForms.length === 0) {
+        return;
+    }
+
+    defaultForms.forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    Accept: 'application/json',
+                },
+                body: new FormData(form),
+            });
+
+            if (!response.ok) {
+                window.location.reload();
+                return;
+            }
+
+            const payload = await response.json() as { payment_method_id?: number };
+            const activeId = String(payload.payment_method_id ?? '');
+
+            document.querySelectorAll<HTMLElement>('[data-payment-method-card]').forEach((card) => {
+                const isActive = card.dataset.paymentMethodId === activeId;
+                const badge = card.querySelector<HTMLElement>('[data-payment-method-default-badge]');
+                const defaultForm = card.querySelector<HTMLElement>('[data-payment-method-default-form]');
+
+                if (badge) {
+                    badge.style.display = isActive ? '' : 'none';
+                }
+
+                if (defaultForm) {
+                    defaultForm.hidden = isActive;
+                }
+            });
+        });
+    });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    bindPaymentMethodDeleteModal();
+    bindPaymentMethodDefaultForms();
+});

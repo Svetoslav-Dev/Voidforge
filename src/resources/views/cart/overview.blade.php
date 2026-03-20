@@ -79,11 +79,11 @@
 
                 @if ($discountSummary)
                     <div class="actions" style="margin-top: 0;">
-                        <p class="muted" style="margin:0;">Applied code {{ $discountSummary['code'] }}</p>
+                        <p class="discount-applied-label" style="margin:0;">Applied code {{ $discountSummary['code'] }}</p>
                         <form method="POST" action="{{ route('cart.discount.destroy') }}">
                             @csrf
                             @method('DELETE')
-                            <button class="button secondary" type="submit">Remove</button>
+                            <button class="button danger" type="submit">Remove</button>
                         </form>
                     </div>
                 @endif
@@ -101,20 +101,20 @@
                         <strong>{{ number_format($item['line_total_cents'] / 100, 2) }} EUR</strong>
                     </p>
                 @endforeach
+                @if ($discountSummary)
+                    <p class="summary-line plain-line discount-summary-line">
+                        <span>Discount · {{ $discountSummary['code'] }}</span>
+                        <strong>-{{ number_format($discountSummary['discount_cents'] / 100, 2) }} EUR</strong>
+                    </p>
+                @endif
                 <p class="summary-line">
                     <span>Subtotal</span>
                     <strong>{{ number_format($subtotalCents / 100, 2) }} EUR</strong>
                 </p>
-                @if ($discountSummary)
-                    <p class="summary-line plain-line">
-                        <span>Discount · {{ $discountSummary['code'] }}</span>
-                        <strong>-{{ number_format($discountSummary['discount_cents'] / 100, 2) }} EUR</strong>
-                    </p>
-                    <p class="summary-line total-line">
-                        <span>Total</span>
-                        <strong>{{ number_format($discountSummary['total_cents'] / 100, 2) }} EUR</strong>
-                    </p>
-                @endif
+                <p class="summary-line total-line">
+                    <span>Total</span>
+                    <strong>{{ number_format(($discountSummary['total_cents'] ?? $subtotalCents) / 100, 2) }} EUR</strong>
+                </p>
                 <p class="muted">Shipping and payment are added in the next checkout step.</p>
                 <div class="actions cart-summary-actions">
                     <a class="button cart-checkout-button" href="{{ route('checkout.index') }}">Confirm shipping address</a>

@@ -1010,6 +1010,27 @@ button:disabled {
     text-shadow: 0 0 14px rgba(216, 154, 88, 0.18);
 }
 
+.discount-applied-label {
+    color: #56a87e;
+    font-weight: 700;
+}
+
+.discount-summary-line,
+.discount-summary-line strong,
+.discount-summary-line span {
+    color: #c96a76;
+}
+
+.receipt-discount-line,
+.receipt-discount-line strong,
+.receipt-discount-line span {
+    color: #c96a76;
+}
+
+.pending-order-status {
+    color: #d89a58;
+}
+
 .cart-summary-card {
     display: flex;
     flex-direction: column;
