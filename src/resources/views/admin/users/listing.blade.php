@@ -1,6 +1,11 @@
 @extends('layouts.app', ['title' => 'Users | Voidforge'])
 
 @section('content')
+    @php
+        $userErrorFields = ['name', 'email', 'password', 'is_admin'];
+        $hasUserFormErrors = collect($userErrorFields)->contains(fn (string $field) => $errors->has($field));
+    @endphp
+
     <section class="card hero">
         <div>
             <h1>Browse users and archive accounts logically.</h1>
@@ -9,8 +14,8 @@
 
         <div class="admin-toolbar">
             <div class="admin-toolbar-left">
-                <a class="button" href="{{ route('admin.users.create') }}">Add new user</a>
                 <a class="button secondary" href="{{ route('admin.panel') }}">Back to admin</a>
+                <button class="button" type="button" data-admin-user-create-open>Add new user</button>
             </div>
 
             <form method="GET" action="{{ route('admin.users.index') }}" class="inline-form admin-toolbar-right admin-search">
@@ -65,4 +70,21 @@
             {{ $users->links() }}
         </div>
     @endif
+
+    <div class="account-address-modal" data-admin-user-modal {{ $hasUserFormErrors ? '' : 'hidden' }}>
+        <div class="account-address-modal__backdrop" data-admin-user-close></div>
+        <div class="card account-address-modal__panel" role="dialog" aria-modal="true" aria-labelledby="admin-user-modal-title">
+            <h2 id="admin-user-modal-title" style="margin-top: 0;">Add new user</h2>
+
+            <form method="POST" action="{{ route('admin.users.store') }}">
+                @csrf
+                @include('admin.users.form-fields', ['user' => null])
+
+                <div class="actions account-address-modal__actions">
+                    <button type="button" class="button danger" data-admin-user-close>Close</button>
+                    <button type="submit">Create user</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection

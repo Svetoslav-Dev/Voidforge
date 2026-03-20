@@ -106,6 +106,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/discount-codes', [AdminDiscountCodeController::class, 'store'])->name('discount-codes.store');
     Route::get('/discount-codes/{discountCode}/edit', [AdminDiscountCodeController::class, 'edit'])->name('discount-codes.edit');
     Route::patch('/discount-codes/{discountCode}', [AdminDiscountCodeController::class, 'update'])->name('discount-codes.update');
+    Route::patch('/discount-codes/{discountCode}/archive', [AdminDiscountCodeController::class, 'archive'])->name('discount-codes.archive');
+    Route::patch('/discount-codes/{discountCode}/restore', [AdminDiscountCodeController::class, 'restore'])->name('discount-codes.restore');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');

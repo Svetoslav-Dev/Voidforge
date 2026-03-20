@@ -40,10 +40,10 @@ class AdminDiscountCodeController extends Controller
 
     public function store(StoreDiscountCodeRequest $request, AdminDiscountCodeService $discountCodes): RedirectResponse
     {
-        $discountCode = $discountCodes->create($request->validated());
+        $discountCodes->create($request->validated());
 
         return redirect()
-            ->route('admin.discount-codes.edit', $discountCode)
+            ->route('admin.discount-codes.index')
             ->with('status', 'Discount code created.');
     }
 
@@ -59,7 +59,25 @@ class AdminDiscountCodeController extends Controller
         $discountCodes->update($discountCode, $request->validated());
 
         return redirect()
-            ->route('admin.discount-codes.edit', $discountCode)
+            ->route('admin.discount-codes.index')
             ->with('status', 'Discount code updated.');
+    }
+
+    public function archive(DiscountCode $discountCode, AdminDiscountCodeService $discountCodes): RedirectResponse
+    {
+        $discountCodes->archive($discountCode);
+
+        return redirect()
+            ->route('admin.discount-codes.index')
+            ->with('status', 'Discount code archived.');
+    }
+
+    public function restore(DiscountCode $discountCode, AdminDiscountCodeService $discountCodes): RedirectResponse
+    {
+        $discountCodes->restore($discountCode);
+
+        return redirect()
+            ->route('admin.discount-codes.index')
+            ->with('status', 'Discount code restored.');
     }
 }

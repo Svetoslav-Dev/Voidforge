@@ -17,7 +17,5 @@ Local demo accounts that should exist after the standard project setup and seedi
 This regular user is seeded with demo purchase history / receipts.
 
 ## Discount codes
-- WELCOME10
-    10% off
-- VOID5
-    5.00 EUR off
+- WELCOME10 does 10% off
+- VOID5 does 5.00 EUR off

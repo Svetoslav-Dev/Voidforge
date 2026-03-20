@@ -1,5 +1,9 @@
 import '../css/app.css';
 import './bootstrap';
+import './admin-category-modal';
+import './admin-discount-codes-page';
+import './admin-discount-code-modal';
+import './admin-user-modal';
 import './auth-modal';
 import './account-address-modal';
 import './account-payment-method-modal';

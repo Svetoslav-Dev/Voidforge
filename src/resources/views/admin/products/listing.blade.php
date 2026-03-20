@@ -9,8 +9,8 @@
 
         <div class="admin-toolbar">
             <div class="admin-toolbar-left">
-                <a class="button" href="{{ route('admin.products.create') }}">Add shirt</a>
                 <a class="button secondary" href="{{ route('admin.panel') }}">Back to admin</a>
+                <a class="button" href="{{ route('admin.products.create') }}">Add shirt</a>
             </div>
 
             <form method="GET" action="{{ route('admin.products.index') }}" class="inline-form admin-toolbar-right admin-search">

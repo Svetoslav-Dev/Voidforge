@@ -3,7 +3,7 @@
 @section('content')
     <section class="card hero">
         <div>
-            <h1>My Account</h1>
+            <h1 style="color: #d89a58;">My Account</h1>
             <p class="lead">
                 Review your purchase history, open receipts, and keep your account flow separate from the admin tools.
             </p>

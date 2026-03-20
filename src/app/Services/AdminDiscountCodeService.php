@@ -23,4 +23,22 @@ class AdminDiscountCodeService
 
         return $discountCode->fresh();
     }
+
+    public function archive(DiscountCode $discountCode): DiscountCode
+    {
+        $discountCode->update([
+            'is_active' => false,
+        ]);
+
+        return $discountCode->fresh();
+    }
+
+    public function restore(DiscountCode $discountCode): DiscountCode
+    {
+        $discountCode->update([
+            'is_active' => true,
+        ]);
+
+        return $discountCode->fresh();
+    }
 }

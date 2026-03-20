@@ -3,13 +3,13 @@
 @section('content')
     <section class="card hero">
         <div>
-            <h1 style="font-size: clamp(1.55rem, 3vw, 2.2rem); text-align: center;">Rule the void storefront</h1>
+            <h1 style="font-size: clamp(1.55rem, 3vw, 2.2rem); text-align: center; color: #d89a58;">Rule the void storefront</h1>
             <p class="lead">Manage the active shirt lineup, edit catalogs, archive records logically, and review incoming orders from one protected area.</p>
         </div>
 
         <div class="actions admin-panel-actions" style="margin-top: 0.85rem;">
             <a class="button secondary" href="{{ route('admin.products.index') }}">Browse shirts</a>
-            <a class="button secondary" href="{{ route('admin.categories.index') }}">Browse catalogs</a>
+            <a class="button secondary" href="{{ route('admin.categories.index') }}">Browse categories</a>
             <a class="button secondary" href="{{ route('admin.users.index') }}">Browse users</a>
             <a class="button secondary" href="{{ route('admin.discount-codes.index') }}">Browse discounts</a>
             <a class="button secondary" href="{{ route('admin.orders.index') }}">Browse orders</a>
@@ -18,27 +18,27 @@
 
     <section class="grid three">
         <article class="card">
-            <h2>Shirts</h2>
+            <h2 style="color: #d89a58;">Shirts</h2>
             <p class="muted">{{ $activeProductCount }} active shirts with {{ $archivedProductCount }} archived.</p>
         </article>
 
         <article class="card">
-            <h2>Catalogs</h2>
+            <h2 style="color: #d89a58;">Catalogs</h2>
             <p class="muted">{{ $categoryCount }} active catalogs with {{ $archivedCategoryCount }} archived.</p>
         </article>
 
         <article class="card">
-            <h2>Users</h2>
+            <h2 style="color: #d89a58;">Users</h2>
             <p class="muted">{{ $userCount }} active users with {{ $archivedUserCount }} archived.</p>
         </article>
 
         <article class="card">
-            <h2>Discounts</h2>
+            <h2 style="color: #d89a58;">Discounts</h2>
             <p class="muted">{{ $discountCodeCount }} discount codes available for carts and checkout.</p>
         </article>
 
         <article class="card">
-            <h2>Orders</h2>
+            <h2 style="color: #d89a58;">Orders</h2>
             <p class="muted">{{ $pendingOrderCount }} pending orders with {{ $archivedOrderCount }} archived.</p>
         </article>
     </section>
@@ -46,7 +46,7 @@
     <section class="card" style="margin-top: 1.5rem;">
         <div style="display: flex; justify-content: space-between; gap: 1rem; align-items: end; flex-wrap: wrap;">
             <div>
-                <h2 style="margin: 0;">Revenue this year</h2>
+                <h2 style="margin: 0; color: #d89a58;">Revenue this year</h2>
                 <p class="muted" style="margin: 0.35rem 0 0;">Paid orders received in {{ $revenueChartYear }} compared with {{ $revenueChartPreviousYear }} by month.</p>
             </div>
             <div style="display: grid; gap: 0.2rem; justify-items: end;">

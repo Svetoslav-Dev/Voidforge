@@ -1,21 +1,34 @@
-@extends('layouts.app', ['title' => 'Catalogs | Voidforge'])
+@extends('layouts.app', ['title' => 'Categories | Voidforge'])
 
 @section('content')
+    @php
+        $categoryErrorFields = ['name', 'slug', 'description'];
+        $hasCategoryErrors = collect($categoryErrorFields)->contains(fn (string $field) => $errors->has($field));
+        $categoryModalMode = old('_category_context', 'create');
+        $isCategoryEditMode = $categoryModalMode === 'edit';
+        $categoryFormAction = $isCategoryEditMode
+            ? old('_category_update_url', route('admin.categories.store'))
+            : route('admin.categories.store');
+        $categoryModalTitle = $isCategoryEditMode
+            ? 'Edit '.old('name', 'category')
+            : 'Add category';
+        $categorySubmitLabel = $isCategoryEditMode ? 'Save category' : 'Create category';
+    @endphp
+
     <section class="card hero">
         <div>
-            <p class="muted">Admin Catalogs</p>
-            <h1>Manage the storefront catalogs.</h1>
-            <p class="lead">Create, edit, and archive catalogs without removing their history from the database.</p>
+            <h1>Manage the storefront categories.</h1>
+            <p class="lead">Create, edit, and archive categories without removing their history from the database.</p>
         </div>
 
         <div class="admin-toolbar">
             <div class="admin-toolbar-left">
-                <a class="button" href="{{ route('admin.categories.create') }}">Add catalog</a>
                 <a class="button secondary" href="{{ route('admin.panel') }}">Back to admin</a>
+                <button class="button" type="button" data-admin-category-create-open>Add category</button>
             </div>
 
             <form method="GET" action="{{ route('admin.categories.index') }}" class="inline-form admin-toolbar-right admin-search">
-                <input type="text" name="q" value="{{ $search }}" placeholder="Search catalogs">
+                <input type="text" name="q" value="{{ $search }}" placeholder="Search categories">
                 <button class="button secondary" type="submit">Search</button>
             </form>
         </div>
@@ -42,7 +55,15 @@
 
                     <div class="actions">
                         @if (! $category->trashed())
-                            <a class="button secondary" href="{{ route('admin.categories.edit', $category) }}">Edit</a>
+                            <button
+                                class="button secondary"
+                                type="button"
+                                data-admin-category-edit-open
+                                data-update-url="{{ route('admin.categories.update', $category) }}"
+                                data-name="{{ $category->name }}"
+                                data-slug="{{ $category->slug }}"
+                                data-description="{{ $category->description }}"
+                            >Edit</button>
                             <form method="POST" action="{{ route('admin.categories.destroy', $category) }}">
                                 @csrf
                                 @method('DELETE')
@@ -66,4 +87,24 @@
             {{ $categories->links() }}
         </div>
     @endif
+
+    <div class="account-address-modal" data-admin-category-modal {{ $hasCategoryErrors ? '' : 'hidden' }}>
+        <div class="account-address-modal__backdrop" data-admin-category-close></div>
+        <div class="card account-address-modal__panel" role="dialog" aria-modal="true" aria-labelledby="admin-category-modal-title">
+            <h2 id="admin-category-modal-title" style="margin-top: 0;" data-admin-category-modal-title>{{ $categoryModalTitle }}</h2>
+
+            <form method="POST" action="{{ $categoryFormAction }}" data-admin-category-form data-store-url="{{ route('admin.categories.store') }}">
+                @csrf
+                <input type="hidden" name="_method" value="PATCH" data-admin-category-method {{ $isCategoryEditMode ? '' : 'disabled' }}>
+                <input type="hidden" name="_category_context" value="{{ $categoryModalMode }}" data-admin-category-context>
+                <input type="hidden" name="_category_update_url" value="{{ old('_category_update_url', '') }}" data-admin-category-update-url>
+                @include('admin.categories.fields', ['category' => null])
+
+                <div class="actions account-address-modal__actions">
+                    <button type="button" class="button danger" data-admin-category-close>Close</button>
+                    <button type="submit" data-admin-category-submit>{{ $categorySubmitLabel }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection

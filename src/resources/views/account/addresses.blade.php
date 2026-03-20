@@ -3,7 +3,7 @@
 @section('content')
     <section class="card hero">
         <div>
-            <h1>Saved Shipping Addresses</h1>
+            <h1 style="color: #d89a58;">Saved Shipping Addresses</h1>
             <p class="lead">
                 Keep your delivery details ready here and reuse them during checkout.
             </p>

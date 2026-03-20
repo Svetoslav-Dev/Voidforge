@@ -3,7 +3,7 @@
 @section('content')
     <section class="card hero">
         <div>
-            <h1>Built for a darker lineup of shirts.</h1>
+            <h1 style="color: #d89a58;">Built for a darker lineup of shirts</h1>
             <p class="lead">
                 Browse the current shirts by category. The demo lineup now carries more shirts so the
                 storefront feels closer to a real first release.

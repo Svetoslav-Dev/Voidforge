@@ -52,10 +52,10 @@ class AdminCategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request, AdminCategoryService $categories): RedirectResponse
     {
-        $category = $categories->create($request->validated());
+        $categories->create($request->validated());
 
         return redirect()
-            ->route('admin.categories.edit', $category)
+            ->route('admin.categories.index')
             ->with('status', 'Catalog created.');
     }
 
@@ -77,7 +77,7 @@ class AdminCategoryController extends Controller
         $categories->update($category, $request->validated());
 
         return redirect()
-            ->route('admin.categories.edit', $category)
+            ->route('admin.categories.index')
             ->with('status', 'Catalog updated.');
     }
 

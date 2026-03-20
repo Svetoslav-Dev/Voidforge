@@ -1,17 +1,16 @@
-@extends('layouts.app', ['title' => 'Add Catalog | Voidforge'])
+@extends('layouts.app', ['title' => 'Add Category | Voidforge'])
 
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Admin Catalogs</p>
-            <h1>Add a new catalog</h1>
+            <h1>Add a new category</h1>
         </div>
     </section>
 
     <section class="card" style="margin-top: 0.6rem;">
         @include('admin.categories.form-fields', [
             'action' => route('admin.categories.store'),
-            'buttonLabel' => 'Create catalog',
+            'buttonLabel' => 'Create category',
             'category' => null,
             'method' => null,
         ])

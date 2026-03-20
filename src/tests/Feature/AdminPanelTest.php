@@ -122,9 +122,9 @@ class AdminPanelTest extends TestCase
         $admin = User::factory()->admin()->create();
 
         $this->actingAs($admin)
-            ->get(route('admin.discount-codes.create'))
+            ->get(route('admin.discount-codes.index'))
             ->assertOk()
-            ->assertSee('Create discount code');
+            ->assertSee('Add discount code');
 
         $this->actingAs($admin)
             ->post(route('admin.discount-codes.store'), [
@@ -133,7 +133,7 @@ class AdminPanelTest extends TestCase
                 'type' => 'percent',
                 'amount' => 10,
                 'is_active' => 1,
-            ])->assertRedirect();
+            ])->assertRedirect(route('admin.discount-codes.index'));
 
         $this->assertDatabaseHas('discount_codes', [
             'code' => 'VOID10',
@@ -160,13 +160,43 @@ class AdminPanelTest extends TestCase
                 'type' => 'percent',
                 'amount' => 15,
                 'is_active' => 1,
-            ])->assertRedirect();
+            ])->assertRedirect(route('admin.discount-codes.index'));
 
         $this->assertDatabaseHas('discount_codes', [
             'id' => $discountCode->id,
             'code' => 'VOID15',
             'type' => 'percent',
             'amount' => 15,
+        ]);
+    }
+
+    public function test_admin_can_archive_and_restore_a_discount_code(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $discountCode = DiscountCode::query()->create([
+            'code' => 'VOID5',
+            'description' => 'Five off',
+            'type' => 'fixed',
+            'amount' => 500,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.discount-codes.archive', $discountCode))
+            ->assertRedirect(route('admin.discount-codes.index'));
+
+        $this->assertDatabaseHas('discount_codes', [
+            'id' => $discountCode->id,
+            'is_active' => 0,
+        ]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.discount-codes.restore', $discountCode))
+            ->assertRedirect(route('admin.discount-codes.index'));
+
+        $this->assertDatabaseHas('discount_codes', [
+            'id' => $discountCode->id,
+            'is_active' => 1,
         ]);
     }
 
