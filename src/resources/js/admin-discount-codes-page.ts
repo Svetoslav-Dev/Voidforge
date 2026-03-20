@@ -76,10 +76,23 @@ const bindAdminDiscountCodesPage = (): void => {
         if (target.matches('[data-admin-discount-codes-toggle-form]')) {
             event.preventDefault();
 
-            void refreshAdminDiscountCodesPage(window.location.href, {
-                method: 'POST',
-                body: new FormData(target),
-            });
+            void (async () => {
+                const response = await fetch(target.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        Accept: 'text/html',
+                    },
+                    body: new FormData(target),
+                });
+
+                if (!response.ok) {
+                    target.submit();
+                    return;
+                }
+
+                await refreshAdminDiscountCodesPage(window.location.href);
+            })();
         }
     });
 

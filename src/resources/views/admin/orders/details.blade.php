@@ -1,10 +1,9 @@
-@extends('layouts.app', ['title' => 'Order #'.$order->id.' | Admin'])
+@extends('layouts.app', ['title' => 'Order #VF'.$order->id.' | Admin'])
 
 @section('content')
     <section class="card hero">
         <div>
-            <p class="muted">Admin Order</p>
-            <h1>Order #{{ $order->id }}</h1>
+            <h1 style="color: #d89a58;">Order #VF{{ $order->id }}</h1>
             <p class="lead">Status: {{ ucfirst(str_replace('_', ' ', $order->status)) }}</p>
         </div>
     </section>

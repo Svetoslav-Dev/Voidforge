@@ -3,7 +3,7 @@
 @section('content')
     <section class="card hero">
         <div>
-            <h1>Review your shirt selection.</h1>
+            <h1 style="color: #d89a58;">Review your shirt selection</h1>
             <p class="lead">
                 This cart is stored in the session for now. Checkout comes next, so this page focuses on
                 quantity control and order subtotal.

@@ -23,8 +23,8 @@
         </article>
 
         <article class="card">
-            <h2 style="color: #d89a58;">Catalogs</h2>
-            <p class="muted">{{ $categoryCount }} active catalogs with {{ $archivedCategoryCount }} archived.</p>
+            <h2 style="color: #d89a58;">Categories</h2>
+            <p class="muted">{{ $categoryCount }} active categories with {{ $archivedCategoryCount }} archived.</p>
         </article>
 
         <article class="card">

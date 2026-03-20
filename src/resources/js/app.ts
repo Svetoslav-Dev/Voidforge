@@ -3,6 +3,7 @@ import './bootstrap';
 import './admin-category-modal';
 import './admin-discount-codes-page';
 import './admin-discount-code-modal';
+import './admin-list-search';
 import './admin-user-modal';
 import './auth-modal';
 import './account-address-modal';
