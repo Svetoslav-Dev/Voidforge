@@ -25,10 +25,12 @@
                 <article class="card" style="padding: 1.15rem 1.25rem;">
                     <div class="product-foot">
                         <div>
-                            @if ((int) $order->user_id === (int) auth()->id())
-                                <p style="margin: 0 0 0.25rem; font-weight: 700; color: #ffb86b;">Current user</p>
-                            @endif
-                            <h2>Order #VF{{ $order->id }}</h2>
+                            <h2>
+                                Order #VF{{ $order->id }}
+                                @if ((int) $order->user_id === (int) auth()->id())
+                                    <span style="color: #ffb86b; font-size: 0.8em;">- Current user</span>
+                                @endif
+                            </h2>
                             <p class="muted">{{ $order->customer_name }} · {{ $order->customer_email }}</p>
                             <p class="muted">
                                 Placed:

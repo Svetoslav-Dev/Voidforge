@@ -1,19 +1,100 @@
 # Voidforge
 
-## Things to add
-- When doing shipping add the default + country number depending on the country selected. Also rename Country code to country.
-- In /admin/users for each user display how many orders they have and last login
-- Add an smpt or mail provider when placing an order to send emails
-- Add which packages should be installed via npm and how to build this app locally for yourself
-- Make search field wider
-- Check if every file is needed in the project
-- Setup CI/CD jenkins & monitoring for the stie
-- Setup paypal for test credentials
-- Setup google analytics
+Voidforge is a Laravel e-commerce project for selling shirts, with authentication, cart, shipping, checkout, hosted Stripe and PayPal payments, receipts, and an admin panel.
 
-## Final touches
-- Try to make the site public
-- Check certificates for the site
-- Check if status codes returned are correct
-- Check other payment methods maybe save the data locally (hashed + encrypted)
-- Maybe add Universe on fire video to /voiforge-info ps you have to download it ot mp4
+## Stack
+
+- Laravel
+- MariaDB
+- Docker
+- TypeScript
+- Stripe
+- PayPal
+
+## Run Locally
+
+### Requirements
+
+- Docker
+- Docker Compose
+
+### 1. Create env files
+
+At the project root:
+
+```bash
+cp .env.example .env
+```
+
+Inside the Laravel app:
+
+```bash
+cp src/.env.example src/.env
+```
+
+### 2. Build and start containers
+
+```bash
+docker-compose up --build
+```
+
+The app container serves:
+
+- HTTP: `http://127.0.0.1:8000`
+- HTTPS: `https://127.0.0.1:8443`
+
+HTTPS uses a local self-signed certificate by default.
+
+### 3. Install app dependencies and bootstrap the project
+
+Run inside the app container:
+
+```bash
+docker compose exec app composer setup
+```
+
+This does:
+
+- installs PHP dependencies
+- creates `src/.env` if missing
+- generates the Laravel app key
+- runs migrations
+- seeds demo data
+- installs frontend dependencies
+- builds frontend assets
+
+### 4. Run tests
+
+```bash
+docker compose exec -T app php artisan test
+```
+
+### 5. Rebuild frontend assets after JS or CSS changes
+
+```bash
+docker compose exec app npm run build
+```
+
+## Demo Accounts
+
+The seeded local setup creates:
+
+- Admin: `demo-admin@example.test` / `DemoPass123!`
+- Customer: `demo-user@example.test` / `DemoPass123!`
+
+Both users have seeded receipts and default shipping addresses.
+
+## Payment Configuration
+
+Stripe and PayPal use environment variables only. Do not hardcode secrets.
+
+Relevant variables are in:
+
+- `.env.example`
+- `src/.env.example`
+
+Additional notes:
+
+- payment test credentials: [PaymentCredentials.md](/home/thinkpadl14/Projects/Voidforge/PaymentCredentials.md)
+- user credentials: [UserCredentials.md](/home/thinkpadl14/Projects/Voidforge/UserCredentials.md)
+- improvement notes: [Improvements](/home/thinkpadl14/Projects/Voidforge/Improvements)
