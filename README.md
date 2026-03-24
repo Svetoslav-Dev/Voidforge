@@ -98,3 +98,13 @@ Additional notes:
 - payment test credentials: [PaymentCredentials.md](/home/thinkpadl14/Projects/Voidforge/PaymentCredentials.md)
 - user credentials: [UserCredentials.md](/home/thinkpadl14/Projects/Voidforge/UserCredentials.md)
 - improvement notes: [Improvements](/home/thinkpadl14/Projects/Voidforge/Improvements)
+
+## Production Notes
+
+If you want to run the site on `voidforgestore.com`, the repo already contains Railway deployment support and production notes.
+
+See:
+
+- [Improvements/Certificates.md](/home/thinkpadl14/Projects/Voidforge/Improvements/Certificates.md)
+- [Improvements/ProductionChecklist.md](/home/thinkpadl14/Projects/Voidforge/Improvements/ProductionChecklist.md)
+- [Improvements/RailwayDeployment.md](/home/thinkpadl14/Projects/Voidforge/Improvements/RailwayDeployment.md)

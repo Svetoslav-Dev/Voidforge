@@ -6,6 +6,16 @@ PORT="${PORT:-8080}"
 mkdir -p /tmp/nginx
 mkdir -p /tmp/nginx-client-body
 
+# Fail early with a clear message if required env vars are missing,
+# rather than letting set -u produce an obscure "unbound variable" crash.
+for _var in DB_HOST DB_USERNAME DB_PASSWORD DB_DATABASE; do
+    eval "_val=\${${_var}:-}"
+    if [ -z "${_val}" ]; then
+        echo "ERROR: Required environment variable ${_var} is not set." >&2
+        exit 1
+    fi
+done
+
 # Generate APP_KEY if not set — this key will not persist across restarts.
 # Set APP_KEY as a Railway environment variable to avoid this.
 if [ -z "${APP_KEY:-}" ]; then
@@ -78,10 +88,18 @@ APP_SERVER_PID=$!
 
 trap 'kill ${APP_SERVER_PID} >/dev/null 2>&1 || true' INT TERM EXIT
 
-# Wait for PHP serve to accept requests before exposing nginx to Railway's
-# health check — prevents 502s during the /up probe on first boot
+# Wait for PHP serve to accept TCP connections before nginx starts.
+# curl without -f: returns 0 on any HTTP response (including 5xx), non-zero
+# only on connection failure. This prevents nginx from starting before the
+# upstream is bound, without blocking forever on an app-level error.
 echo "Waiting for PHP server on port 9000..." >&2
-until curl -sf http://127.0.0.1:9000/up >/dev/null 2>&1; do
+RETRIES=30
+until curl -s --connect-timeout 1 -o /dev/null http://127.0.0.1:9000/up 2>/dev/null; do
+    RETRIES=$((RETRIES - 1))
+    if [ "${RETRIES}" -eq 0 ]; then
+        echo "PHP server did not bind to port 9000 in time." >&2
+        exit 1
+    fi
     sleep 1
 done
 
