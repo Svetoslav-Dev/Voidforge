@@ -1,0 +1,64 @@
+# Stage 1: Build frontend assets
+FROM node:22-slim AS frontend-builder
+WORKDIR /app
+COPY src/package*.json ./
+RUN npm ci
+COPY src/ .
+RUN npm run build
+
+# Stage 2: Production PHP image
+FROM php:8.3-fpm
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        unzip \
+        zip \
+        libzip-dev \
+        libicu-dev \
+        libonig-dev \
+        libxml2-dev \
+        mariadb-client \
+        curl \
+        nginx-light \
+    && docker-php-ext-install \
+        bcmath \
+        intl \
+        mbstring \
+        pdo_mysql \
+        zip \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+COPY src/ .
+
+# Overwrite with freshly built frontend assets
+COPY --from=frontend-builder /app/public/build public/build
+
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+RUN mkdir -p \
+        storage/app/public \
+        storage/certs \
+        storage/framework/cache/data \
+        storage/framework/sessions \
+        storage/framework/testing \
+        storage/framework/views \
+        storage/logs \
+        storage/tmp \
+        bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+COPY docker/app/entrypoint.sh /usr/local/bin/voidforge-entrypoint
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY docker/app/start.sh /usr/local/bin/voidforge-start
+COPY docker/app/start-railway.sh /usr/local/bin/voidforge-start-railway
+RUN chmod +x /usr/local/bin/voidforge-entrypoint \
+    && chmod +x /usr/local/bin/voidforge-start \
+    && chmod +x /usr/local/bin/voidforge-start-railway
+
+ENTRYPOINT ["voidforge-entrypoint"]
+CMD ["voidforge-start-railway"]
