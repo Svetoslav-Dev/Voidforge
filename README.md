@@ -1,6 +1,6 @@
 # Voidforge
 
-Voidforge is a Laravel e-commerce project for selling shirts, with authentication, cart, shipping, checkout, hosted Stripe and PayPal payments, receipts, and an admin panel.
+Voidforge is a Laravel e-commerce storefront for selling shirts, with authentication, catalog browsing, cart and shipping flow, hosted Stripe and PayPal payments, saved addresses and cards, receipts and PDF invoices, queued order emails, and an admin panel.
 
 ## Stack
 
@@ -8,8 +8,22 @@ Voidforge is a Laravel e-commerce project for selling shirts, with authenticatio
 - MariaDB
 - Docker
 - TypeScript
+- Brevo SMTP
 - Stripe
 - PayPal
+- Cloudflare Tunnel
+
+## What The App Does
+
+- customer authentication and account management
+- product catalog with category filtering and AJAX cart actions
+- cart, shipping, payment, and completed-order flow
+- hosted Stripe and PayPal checkout
+- saved shipping addresses and saved Stripe cards
+- customer receipt history and PDF invoice download
+- queued order-completion emails with retry support
+- admin management for shirts, categories, users, orders, and discount codes
+- local self-hosting with optional Cloudflare Tunnel exposure
 
 ## Run Locally
 
@@ -69,7 +83,15 @@ This does:
 docker compose exec -T app php artisan test
 ```
 
-### 5. Rebuild frontend assets after JS or CSS changes
+### 5. Run queued jobs locally
+
+Order confirmation emails are queued. Keep a worker running while testing payments or retrying email delivery:
+
+```bash
+docker compose exec app php artisan queue:work --tries=5
+```
+
+### 6. Rebuild frontend assets after JS or CSS changes
 
 ```bash
 docker compose exec app npm run build
@@ -83,6 +105,13 @@ The seeded local setup creates:
 - Customer: `demo-user@example.test` / `DemoPass123!`
 
 Both users have seeded receipts and default shipping addresses.
+
+Seeded demo data also includes:
+
+- completed and pending orders
+- default shipping addresses
+- catalog categories and shirts
+- default discount codes
 
 ## Payment Configuration
 
@@ -99,9 +128,35 @@ Additional notes:
 - user credentials: [UserCredentials.md](/home/thinkpadl14/Projects/Voidforge/UserCredentials.md)
 - improvement notes: [Improvements](/home/thinkpadl14/Projects/Voidforge/Improvements)
 
+## Email Configuration
+
+Transactional mail is configured through SMTP environment variables only. For Brevo, use:
+
+- `MAIL_MAILER=smtp`
+- `MAIL_SCHEME=null`
+- `MAIL_HOST=smtp-relay.brevo.com`
+- `MAIL_PORT=587`
+- `MAIL_USERNAME=your-brevo-smtp-login`
+- `MAIL_PASSWORD=your-brevo-smtp-key`
+- `MAIL_EHLO_DOMAIN=voidforgestore.com`
+- `MAIL_FROM_ADDRESS=orders@voidforgestore.com`
+- `MAIL_FROM_NAME=Voidforge`
+
+Docker now passes these mail variables through from the project root `.env`, so you can switch the whole stack to Brevo without touching PHP code.
+
+Order completion emails are queued after a paid order and tracked on the order as `pending`, `sent`, or `failed`.
+
+For a real public store, prefer a sender on your own domain such as `orders@voidforgestore.com` instead of a temporary mailbox.
+
+To retry failed or stuck order emails manually:
+
+```bash
+docker compose exec app php artisan orders:retry-completed-emails
+```
+
 ## Production Notes
 
-To run the site publicly on `voidforgestore.com` from your own computer, the repo includes Cloudflare Tunnel support.
+To run the site publicly on `voidforgestore.com` from your own computer, the repo includes Cloudflare Tunnel support. The current tunnel setup uses Cloudflare public HTTPS and forwards traffic internally to `http://app:8000`, so no router port forwarding is required.
 
 See:
 
