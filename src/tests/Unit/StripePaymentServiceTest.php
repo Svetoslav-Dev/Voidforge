@@ -32,7 +32,7 @@ class StripePaymentServiceTest extends TestCase
             ->withArgs(function (array $payload): bool {
                 return ($payload['customer'] ?? null) === 'cus_saved_123'
                     && ! array_key_exists('customer_email', $payload)
-                    && ($payload['payment_method_types'] ?? null) === ['card'];
+                    && ! array_key_exists('payment_method_types', $payload);
             })
             ->andReturn([
                 'id' => 'cs_test_saved',
@@ -63,7 +63,7 @@ class StripePaymentServiceTest extends TestCase
             ->withArgs(function (array $payload): bool {
                 return ($payload['customer_email'] ?? null) === 'cookie@example.test'
                     && ! array_key_exists('customer', $payload)
-                    && ($payload['payment_method_types'] ?? null) === ['card'];
+                    && ! array_key_exists('payment_method_types', $payload);
             })
             ->andReturn([
                 'id' => 'cs_test_email',
@@ -96,10 +96,10 @@ class StripePaymentServiceTest extends TestCase
                 'metadata' => [
                     'order_id' => (string) $order->id,
                 ],
-            ]);
+        ]);
 
         $mailer = Mockery::mock(OrderCompletionMailService::class);
-        $mailer->shouldReceive('sendFor')
+        $mailer->shouldReceive('queueFor')
             ->once()
             ->withArgs(fn (Order $paidOrder): bool => $paidOrder->is($order) && $paidOrder->status === 'paid');
 

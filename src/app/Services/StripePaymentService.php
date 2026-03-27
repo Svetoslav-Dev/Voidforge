@@ -33,7 +33,6 @@ class StripePaymentService
 
         $payload = [
             'mode' => 'payment',
-            'payment_method_types' => ['card'],
             'client_reference_id' => (string) $order->id,
             'success_url' => route('checkout.payment').'?stripe=success&session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('checkout.payment').'?stripe=cancelled',
