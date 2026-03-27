@@ -1,4 +1,38 @@
 services:
+  queue-worker:
+    image: voidforge-app
+    container_name: voidforge-queue-worker
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/runtime/storage:/var/www/html/storage
+      - ./docker/runtime/cache:/var/www/html/bootstrap/cache
+    user: "${WWWUSER:-1000}:${WWWGROUP:-1000}"
+    command: php artisan queue:work --tries=5 --sleep=3 --timeout=120
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  scheduler:
+    image: voidforge-app
+    container_name: voidforge-scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/runtime/storage:/var/www/html/storage
+      - ./docker/runtime/cache:/var/www/html/bootstrap/cache
+    user: "${WWWUSER:-1000}:${WWWGROUP:-1000}"
+    command: php artisan schedule:work
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
