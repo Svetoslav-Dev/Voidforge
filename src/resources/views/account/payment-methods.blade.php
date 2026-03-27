@@ -1,11 +1,11 @@
-@extends('layouts.app', ['title' => 'Saved Cards | Voidforge'])
+@extends('layouts.app', ['title' => 'Saved Cards | VoidForgeStore'])
 
 @section('content')
     <section class="card hero">
         <div>
             <h1>Saved Cards</h1>
             <p class="lead">
-                Add cards through Stripe's hosted flow. Voidforge stores only masked card details for display.
+                Add cards through Stripe's hosted flow. VoidForgeStore stores only masked card details for display.
             </p>
         </div>
 

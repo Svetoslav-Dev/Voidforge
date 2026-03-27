@@ -26,7 +26,7 @@ class OrderCompletedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Voidforge order VF'.$this->order->id.' completed',
+            subject: 'VoidForgeStore order VF'.$this->order->id.' completed',
         );
     }
 

@@ -1,11 +1,11 @@
-@extends('layouts.app', ['title' => 'Voidforge'])
+@extends('layouts.app', ['title' => 'VoidForgeStore'])
 
 @section('content')
     <section class="card hero">
         <div>
             <h1>Dark goods for a sharper catalog</h1>
             <p class="lead">
-                Voidforge is a dark-themed shirt storefront built for browsing items, managing accounts,
+                VoidForgeStore is a dark-themed shirt storefront built for browsing items, managing accounts,
                 checking out with hosted payments, and handling catalog and order operations through an admin area.
             </p>
         </div>

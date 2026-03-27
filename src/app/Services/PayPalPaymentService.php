@@ -253,8 +253,8 @@ class PayPalPaymentService
                 ->build()
         )
             ->customId((string) $order->id)
-            ->invoiceId('VOIDFORGE-'.$order->id)
-            ->description('Voidforge order #'.$order->id)
+            ->invoiceId('VOIDFORGESTORE-'.$order->id)
+            ->description('VoidForgeStore order #'.$order->id)
             ->items($order->items->map(fn ($item) => ItemRequestBuilder::init(
                 $item->product_name.' ('.$item->product_size.')',
                 MoneyBuilder::init($currency, $this->formatMoney($item->unit_price_cents))->build(),
