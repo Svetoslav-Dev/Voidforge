@@ -104,7 +104,7 @@ class PayPalPaymentService
         $order = $payment->order->fresh(['items.product', 'payments']);
 
         if ($order->status === 'paid') {
-            $this->orderCompletionMailService()->sendFor($order);
+            $this->orderCompletionMailService()->queueFor($order);
         }
 
         return $order;
@@ -220,7 +220,7 @@ class PayPalPaymentService
         });
 
         if ($order?->status === 'paid') {
-            $this->orderCompletionMailService()->sendFor($order);
+            $this->orderCompletionMailService()->queueFor($order);
         }
     }
 

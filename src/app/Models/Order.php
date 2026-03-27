@@ -12,6 +12,10 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const EMAIL_STATUS_PENDING = 'pending';
+    public const EMAIL_STATUS_SENT = 'sent';
+    public const EMAIL_STATUS_FAILED = 'failed';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -38,6 +42,7 @@ class Order extends Model
         'shipping_country',
         'placed_at',
         'receipt_emailed_at',
+        'email_status',
     ];
 
     /**

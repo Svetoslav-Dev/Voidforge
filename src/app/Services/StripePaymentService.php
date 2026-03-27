@@ -189,7 +189,7 @@ class StripePaymentService
         });
 
         if ($status === 'paid' && $order) {
-            $this->orderCompletionMailService()->sendFor($order);
+            $this->orderCompletionMailService()->queueFor($order);
         }
     }
 
@@ -282,7 +282,7 @@ class StripePaymentService
         });
 
         if ($status === 'paid' && $order) {
-            $this->orderCompletionMailService()->sendFor($order);
+            $this->orderCompletionMailService()->queueFor($order);
         }
 
         return $order;
