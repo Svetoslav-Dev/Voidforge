@@ -43,6 +43,8 @@ class OrderHistoryTest extends TestCase
             ->get(route('orders.show', ['orderReference' => 'VF'.$ownOrder->id]))
             ->assertOk()
             ->assertSee('Order #VF'.$ownOrder->id)
+            ->assertSee('Support and policy access')
+            ->assertSee(route('legal.contact'), false)
             ->assertDontSee('Transaction: tx-own');
 
         $this->actingAs($user)

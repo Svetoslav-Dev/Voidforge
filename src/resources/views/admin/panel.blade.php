@@ -12,6 +12,7 @@
             <a class="button secondary" href="{{ route('admin.categories.index') }}">Browse categories</a>
             <a class="button secondary" href="{{ route('admin.users.index') }}">Browse users</a>
             <a class="button secondary" href="{{ route('admin.discount-codes.index') }}">Browse discounts</a>
+            <a class="button secondary" href="{{ route('admin.legal-requests.index') }}">Browse requests</a>
             <a class="button secondary" href="{{ route('admin.orders.index') }}">Browse orders</a>
         </div>
     </section>
@@ -35,6 +36,11 @@
         <article class="card">
             <h2 style="color: #d89a58;">Discounts</h2>
             <p class="muted">{{ $discountCodeCount }} discount codes available for carts and checkout.</p>
+        </article>
+
+        <article class="card">
+            <h2 style="color: #d89a58;">Requests</h2>
+            <p class="muted">{{ $openLegalContactRequestCount }} open requests with {{ $legalContactRequestCount }} total submitted.</p>
         </article>
 
         <article class="card">

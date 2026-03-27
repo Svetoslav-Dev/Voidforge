@@ -69,7 +69,7 @@ class ReceiptPdfService
     private function receiptLines(Order $order): array
     {
         $lines = [
-            'VOIDFORGE RECEIPT',
+            'VOIDFORGESTORE RECEIPT',
             '------------------------------',
             'Order #VF'.$order->id,
             'Placed: '.(optional($order->placed_at)->format('F d, Y H:i') ?? $order->created_at->format('F d, Y H:i')),
@@ -131,6 +131,10 @@ class ReceiptPdfService
             $lines[] = sprintf('Discount (%s): -%0.2f EUR', $order->discount_code, $order->discount_cents / 100);
         }
         $lines[] = sprintf('Total: %0.2f EUR', $order->total_cents / 100);
+        $lines[] = '';
+        $lines[] = 'Trader: '.config('legal.trader_name');
+        $lines[] = 'Support: '.config('legal.support_email');
+        $lines[] = 'Complaints: '.config('legal.complaints_email');
 
         return $lines;
     }

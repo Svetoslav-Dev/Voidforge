@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\DiscountCode;
+use App\Models\LegalContactRequest;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -69,6 +70,8 @@ class AdminPanelController extends Controller
             'userCount' => User::query()->count(),
             'archivedUserCount' => User::onlyTrashed()->count(),
             'discountCodeCount' => DiscountCode::query()->count(),
+            'legalContactRequestCount' => LegalContactRequest::query()->count(),
+            'openLegalContactRequestCount' => LegalContactRequest::query()->whereNull('resolved_at')->count(),
             'revenueChartYear' => $startOfYear->year,
             'revenueChartPreviousYear' => $startOfLastYear->year,
             'monthlyRevenue' => $monthlyRevenue,

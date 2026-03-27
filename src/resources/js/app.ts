@@ -11,5 +11,6 @@ import './account-payment-method-modal';
 import './account-delete-confirmation';
 import './checkout-address';
 import './checkout-complete-cards';
+import './cookie-consent';
 import './product-catalog';
 import './product-gallery';

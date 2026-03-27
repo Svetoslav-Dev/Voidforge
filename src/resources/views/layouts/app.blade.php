@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         @php
-            $rawTitle = trim((string) ($title ?? 'Voidforge'));
-            $baseTitle = '🟣 Voidforge';
-            $pageTitle = trim(str_replace(['| Voidforge', '| Admin'], '', $rawTitle));
-            $documentTitle = $pageTitle === '' || $pageTitle === 'Voidforge'
+            $rawTitle = trim((string) ($title ?? 'VoidForgeStore'));
+            $baseTitle = '🟣 VoidForgeStore';
+            $pageTitle = trim(str_replace(['| VoidForgeStore', '| Voidforge', '| Admin'], '', $rawTitle));
+            $documentTitle = $pageTitle === '' || in_array($pageTitle, ['VoidForgeStore', 'Voidforge'], true)
                 ? $baseTitle
                 : $baseTitle.' | '.$pageTitle;
             $authModal = old('auth_modal');
@@ -21,7 +21,7 @@
                 <div class="nav-group" data-nav-group>
                     <a class="brand" href="{{ route('home') }}">
                         <span class="brand-mark" aria-hidden="true"></span>
-                        <span class="brand-text">Voidforge</span>
+                        <span class="brand-text">VoidForgeStore</span>
                     </a>
                     <a class="button secondary" href="{{ route('products.index') }}">Browse Shirts</a>
                     @auth
@@ -59,6 +59,59 @@
             @if (session('status'))
                 <div class="status">{{ session('status') }}</div>
             @endif
+
+            <div class="cookie-consent" data-cookie-consent hidden>
+                <div class="card cookie-consent__panel">
+                    <div class="cookie-consent__copy">
+                        <p class="cookie-consent__title">Cookie preferences</p>
+                        <p class="muted">VoidForgeStore uses essential cookies for login, cart, checkout, and security. Optional cookies should only be enabled if you decide to allow them later.</p>
+                        <a href="{{ route('legal.cookies') }}">Read the Cookie Policy</a>
+                    </div>
+
+                    <div class="cookie-consent__actions">
+                        <button class="button secondary" type="button" data-cookie-consent-open-preferences>Preferences</button>
+                        <button class="button secondary" type="button" data-cookie-consent-reject>Essential only</button>
+                        <button class="button" type="button" data-cookie-consent-accept>Accept all</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cookie-preferences-modal" data-cookie-preferences-modal hidden>
+                <div class="cookie-preferences-modal__backdrop" data-cookie-preferences-close></div>
+
+                <section class="card cookie-preferences-modal__panel">
+                    <div class="cookie-preferences-modal__header">
+                        <div>
+                            <h2>Cookie preferences</h2>
+                            <p class="muted">Essential cookies stay enabled because the storefront depends on them. Optional cookies are off unless you choose otherwise.</p>
+                        </div>
+                        <button class="button danger" type="button" data-cookie-preferences-close>Close</button>
+                    </div>
+
+                    <div class="cookie-preferences-modal__body">
+                        <label class="cookie-preferences-option">
+                            <span>
+                                <strong>Essential cookies</strong>
+                                <span class="muted">Required for authentication, cart persistence, checkout, session handling, and security protections.</span>
+                            </span>
+                            <input type="checkbox" checked disabled>
+                        </label>
+
+                        <label class="cookie-preferences-option">
+                            <span>
+                                <strong>Optional cookies</strong>
+                                <span class="muted">Reserved for future analytics or marketing tools. These are currently disabled by default.</span>
+                            </span>
+                            <input type="checkbox" data-cookie-preferences-optional>
+                        </label>
+                    </div>
+
+                    <div class="cookie-preferences-modal__actions">
+                        <button class="button secondary" type="button" data-cookie-preferences-essential>Use essential only</button>
+                        <button class="button" type="button" data-cookie-preferences-save>Save preferences</button>
+                    </div>
+                </section>
+            </div>
 
             @yield('content')
 
@@ -182,7 +235,7 @@
             <footer class="card site-footer">
                 <div class="site-footer__grid">
                     <section class="site-footer__section">
-                        <p class="site-footer__title">Voidforge</p>
+                        <p class="site-footer__title">VoidForgeStore</p>
                         <p class="muted">Void-themed shirts, secure checkout, and account tools built for a compact storefront experience.</p>
                     </section>
 
@@ -190,14 +243,24 @@
                         <p class="site-footer__title">Store</p>
                         <a href="{{ route('products.index') }}">Browse shirts</a>
                         <a href="{{ route('cart.index') }}">Cart</a>
-                        <a href="{{ route('home') }}">Voidforge info</a>
+                        <a href="{{ route('home') }}">VoidForgeStore info</a>
+                    </section>
+
+                    <section class="site-footer__section">
+                        <p class="site-footer__title">Legal</p>
+                        <a href="{{ route('legal.privacy') }}">Privacy Policy</a>
+                        <a href="{{ route('legal.terms') }}">Terms and Conditions</a>
+                        <a href="{{ route('legal.returns') }}">Returns and Refunds</a>
+                        <a href="{{ route('legal.shipping') }}">Shipping and Delivery</a>
+                        <a href="{{ route('legal.cookies') }}">Cookie Policy</a>
                     </section>
 
                     <section class="site-footer__section">
                         <p class="site-footer__title">Contact</p>
-                        <p class="muted">support@voidforge.test</p>
-                        <p class="muted">+359 2 555 0142</p>
-                        <p class="muted">13 Void Circuit, Sofia</p>
+                        <a href="{{ route('legal.contact') }}">Trader information</a>
+                        <p class="muted">{{ config('legal.support_email') }}</p>
+                        <p class="muted">{{ config('legal.support_phone') }}</p>
+                        <p class="muted">{{ config('legal.trader_address') }}</p>
                     </section>
 
                     <section class="site-footer__section">
@@ -207,8 +270,11 @@
                 </div>
 
                 <div class="site-footer__bottom">
-                    <p class="muted">Secure checkout with Laravel validation, CSRF protection, hashed passwords, and server-side order handling.</p>
-                    <p class="muted">© {{ now()->year }} Voidforge</p>
+                    <p class="muted">Secure checkout with Laravel validation, CSRF protection, hashed passwords, server-side order handling, and hosted Stripe and PayPal payments.</p>
+                    <div class="site-footer__bottom-links">
+                        <button class="button secondary site-footer__button" type="button" data-cookie-consent-open-preferences>Cookie preferences</button>
+                        <p class="muted">© {{ now()->year }} VoidForgeStore</p>
+                    </div>
                 </div>
             </footer>
         </div>

@@ -2,11 +2,11 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Voidforge order completed</title>
+        <title>VoidForgeStore order completed</title>
     </head>
     <body style="margin: 0; padding: 24px; background: #050816; color: #edf3ff; font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;">
         <div style="max-width: 720px; margin: 0 auto; background: #0c1326; border: 1px solid rgba(136, 156, 211, 0.22); border-radius: 20px; padding: 24px;">
-            <p style="margin: 0 0 8px; color: #8e99b8;">Voidforge</p>
+            <p style="margin: 0 0 8px; color: #8e99b8;">VoidForgeStore</p>
             <h1 style="margin: 0 0 12px; font-size: 28px;">Order #VF{{ $order->id }} completed</h1>
             <p style="margin: 0 0 24px; color: #8e99b8; line-height: 1.6;">
                 Your payment was confirmed. Attached is the PDF receipt for this purchase.
@@ -52,7 +52,17 @@
                 <h2 style="margin: 0 0 12px; font-size: 18px;">Order totals</h2>
                 <p style="margin: 0 0 6px;"><strong>Subtotal:</strong> {{ number_format($order->subtotal_cents / 100, 2) }} EUR</p>
                 <p style="margin: 0 0 6px;"><strong>Shipping:</strong> {{ number_format($order->shipping_cents / 100, 2) }} EUR</p>
+                @if ($order->discount_cents > 0)
+                    <p style="margin: 0 0 6px; color: #c96a76;"><strong>Discount:</strong> -{{ number_format($order->discount_cents / 100, 2) }} EUR</p>
+                @endif
                 <p style="margin: 0;"><strong>Total:</strong> {{ number_format($order->total_cents / 100, 2) }} EUR</p>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(136, 156, 211, 0.18);">
+                <p style="margin: 0 0 6px; color: #8e99b8;">Trader: {{ config('legal.trader_name') }}</p>
+                <p style="margin: 0 0 6px; color: #8e99b8;">Support: {{ config('legal.support_email') }}</p>
+                <p style="margin: 0 0 6px; color: #8e99b8;">Complaints: {{ config('legal.complaints_email') }}</p>
+                <p style="margin: 0; color: #8e99b8;">Policies: {{ route('legal.terms') }} | {{ route('legal.privacy') }} | {{ route('legal.returns') }}</p>
             </div>
         </div>
     </body>

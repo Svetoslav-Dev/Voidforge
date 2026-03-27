@@ -107,10 +107,15 @@
                 </div>
 
                 <div class="actions checkout-payment-actions">
-                    <form method="POST" action="{{ route('stripe.checkout.store', $order) }}">
-                        @csrf
-                        <button type="submit">Pay with Stripe</button>
-                    </form>
+                    <div class="checkout-payment-option">
+                        <form method="POST" action="{{ route('stripe.checkout.store', $order) }}">
+                            @csrf
+                            <button type="submit">Pay with Stripe</button>
+                        </form>
+                        <p class="muted checkout-payment-note">
+                            Stripe Checkout may also show Apple Pay and Google Pay when your device, browser, and wallet setup support them.
+                        </p>
+                    </div>
 
                     <form method="POST" action="{{ route('paypal.checkout.store', $order) }}">
                         @csrf
@@ -124,6 +129,15 @@
                     @auth
                         <a class="button secondary" href="{{ route('orders.index') }}">Purchase history</a>
                     @endauth
+                </div>
+                <div class="checkout-disclosure">
+                    <p class="checkout-disclosure__title">Need help after the order?</p>
+                    <p class="muted">For support, returns, privacy, or complaints, use the trader contact page or reply to the order email.</p>
+                    <div class="checkout-disclosure__links">
+                        <a href="{{ route('legal.contact') }}">Contact and trader information</a>
+                        <a href="{{ route('legal.returns') }}">Returns</a>
+                        <a href="{{ route('legal.privacy') }}">Privacy</a>
+                    </div>
                 </div>
             @endif
         </article>

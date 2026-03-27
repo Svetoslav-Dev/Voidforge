@@ -9,10 +9,12 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminDiscountCodeController;
+use App\Http\Controllers\Admin\AdminLegalContactRequestController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LegalContactRequestController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\PayPalCheckoutController;
 use App\Http\Controllers\ProductController;
@@ -23,6 +25,15 @@ use Illuminate\Support\Facades\Storage;
 Route::redirect('/', '/products');
 
 Route::view('/voidforge-info', 'welcome')->name('home');
+Route::view('/privacy-policy', 'legal.privacy')->name('legal.privacy');
+Route::view('/terms-and-conditions', 'legal.terms')->name('legal.terms');
+Route::view('/returns-and-refunds', 'legal.returns')->name('legal.returns');
+Route::view('/shipping-and-delivery', 'legal.shipping')->name('legal.shipping');
+Route::view('/cookies', 'legal.cookies')->name('legal.cookies');
+Route::view('/contact-and-trader-info', 'legal.contact')->name('legal.contact');
+Route::post('/contact-and-trader-info/request', LegalContactRequestController::class)
+    ->middleware('throttle:6,10')
+    ->name('legal.contact.request');
 
 Route::get('/media/{path}', function (string $path) {
     abort_unless(Storage::disk('public')->exists($path), 404);
@@ -108,6 +119,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/discount-codes/{discountCode}', [AdminDiscountCodeController::class, 'update'])->name('discount-codes.update');
     Route::patch('/discount-codes/{discountCode}/archive', [AdminDiscountCodeController::class, 'archive'])->name('discount-codes.archive');
     Route::patch('/discount-codes/{discountCode}/restore', [AdminDiscountCodeController::class, 'restore'])->name('discount-codes.restore');
+    Route::get('/legal-requests', [AdminLegalContactRequestController::class, 'index'])->name('legal-requests.index');
+    Route::patch('/legal-requests/{legalContactRequest}/resolve', [AdminLegalContactRequestController::class, 'resolve'])->name('legal-requests.resolve');
+    Route::patch('/legal-requests/{legalContactRequest}/reopen', [AdminLegalContactRequestController::class, 'reopen'])->name('legal-requests.reopen');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');

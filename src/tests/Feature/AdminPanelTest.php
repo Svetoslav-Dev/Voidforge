@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\DiscountCode;
+use App\Models\LegalContactRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -36,6 +37,13 @@ class AdminPanelTest extends TestCase
     public function test_admin_can_view_the_admin_panel(): void
     {
         $admin = User::factory()->admin()->create();
+        LegalContactRequest::query()->create([
+            'name' => 'Svetoslav Forge',
+            'email' => 'svetoslav@example.test',
+            'topic' => 'privacy',
+            'order_reference' => 'VF31',
+            'message' => 'Please review my privacy request.',
+        ]);
 
         Order::query()->create([
             'status' => 'paid',
@@ -77,11 +85,36 @@ class AdminPanelTest extends TestCase
             ->get(route('admin.panel'))
             ->assertOk()
             ->assertSee('Rule the void storefront')
-            ->assertSee('Catalogs')
+            ->assertSee('Requests')
             ->assertSee('Revenue this year')
             ->assertSee((string) now()->year)
             ->assertSee((string) now()->subYear()->year)
             ->assertSee('Feb');
+    }
+
+    public function test_admin_can_view_and_resolve_legal_contact_requests(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $request = LegalContactRequest::query()->create([
+            'name' => 'Svetoslav Forge',
+            'email' => 'svetoslav@example.test',
+            'topic' => 'privacy',
+            'order_reference' => 'VF31',
+            'message' => 'Please review my privacy request.',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.legal-requests.index'))
+            ->assertOk()
+            ->assertSee('Browse legal and support requests')
+            ->assertSee('Svetoslav Forge')
+            ->assertSee('VF31');
+
+        $this->actingAs($admin)
+            ->patch(route('admin.legal-requests.resolve', $request))
+            ->assertRedirect(route('admin.legal-requests.index'));
+
+        $this->assertNotNull($request->fresh()->resolved_at);
     }
 
     public function test_admin_can_open_my_account_page(): void

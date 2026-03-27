@@ -112,6 +112,17 @@
                     </form>
                 </div>
             @endif
+
+            <div class="checkout-disclosure" style="margin-top: 1rem;">
+                <p class="checkout-disclosure__title">Support and policy access</p>
+                <p class="muted">Support: {{ config('legal.support_email') }}. Complaints: {{ config('legal.complaints_email') }}.</p>
+                <div class="checkout-disclosure__links">
+                    <a href="{{ route('legal.contact') }}">Contact and trader information</a>
+                    <a href="{{ route('legal.returns') }}">Returns</a>
+                    <a href="{{ route('legal.privacy') }}">Privacy</a>
+                    <a href="{{ route('legal.terms') }}">Terms</a>
+                </div>
+            </div>
         </article>
     </section>
 @endsection

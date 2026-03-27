@@ -156,6 +156,21 @@ class CartTest extends TestCase
         $this->assertNull(session('cart.discount_code'));
     }
 
+    public function test_cart_page_contains_policy_links_before_shipping(): void
+    {
+        $product = $this->product();
+
+        $this->withSession([
+            'cart.items' => [$product->id.':M' => 1],
+        ])->get(route('cart.index'))
+            ->assertOk()
+            ->assertSee('Before shipping')
+            ->assertSee(route('legal.terms'), false)
+            ->assertSee(route('legal.privacy'), false)
+            ->assertSee(route('legal.returns'), false)
+            ->assertSee(route('legal.contact'), false);
+    }
+
     private function product(int $stock = 25): Product
     {
         $category = Category::factory()->create([
