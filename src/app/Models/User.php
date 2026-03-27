@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use App\Models\SavedPaymentMethod;
 use App\Models\ShippingAddress;
+use App\Models\CartReminder;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -58,5 +59,10 @@ class User extends Authenticatable
     public function savedPaymentMethods(): HasMany
     {
         return $this->hasMany(SavedPaymentMethod::class)->orderByDesc('is_default')->orderBy('id');
+    }
+
+    public function cartReminders(): HasMany
+    {
+        return $this->hasMany(CartReminder::class);
     }
 }

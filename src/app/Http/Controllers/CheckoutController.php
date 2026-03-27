@@ -6,6 +6,7 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 use App\Models\Order;
 use App\Services\CartService;
 use App\Services\CheckoutService;
+use App\Services\CartReminderService;
 use App\Services\DiscountCodeService;
 use App\Services\ReceiptPdfService;
 use App\Services\StripePaymentService;
@@ -210,7 +211,7 @@ class CheckoutController extends Controller
     /**
      * Display the completed checkout confirmation page.
      */
-    public function complete(Request $request, CartService $cart): View|RedirectResponse
+    public function complete(Request $request, CartService $cart, CartReminderService $cartReminders): View|RedirectResponse
     {
         $completedOrderId = (int) $request->session()->get('checkout.completed_order_id', 0);
         $order = $completedOrderId > 0 ? Order::query()->find($completedOrderId) : null;
@@ -224,6 +225,7 @@ class CheckoutController extends Controller
             && (int) $request->session()->get('checkout.pending_order_id', 0) === (int) $order->id
         ) {
             $cart->clear();
+            $cartReminders->clearFor($request->user());
             $request->session()->forget('checkout.pending_order_id');
         }
 

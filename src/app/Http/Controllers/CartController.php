@@ -7,6 +7,7 @@ use App\Http\Requests\Cart\AddToCartRequest;
 use App\Http\Requests\Cart\UpdateCartItemRequest;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Services\CartReminderService;
 use App\Services\DiscountCodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +19,8 @@ class CartController extends Controller
 {
     public function __construct(
         private readonly CartService $cart,
-        private readonly DiscountCodeService $discountCodes
+        private readonly DiscountCodeService $discountCodes,
+        private readonly CartReminderService $cartReminders
     ) {
     }
 
@@ -47,6 +49,7 @@ class CartController extends Controller
             (string) $request->validated('size'),
             (int) $request->validated('quantity')
         );
+        $this->cartReminders->syncFor($request->user());
 
         $status = $product->name.' added to cart.';
 
@@ -71,6 +74,7 @@ class CartController extends Controller
         $size = (string) $request->validated('size');
 
         $this->cart->update($product, $size, $quantity);
+        $this->cartReminders->syncFor($request->user());
 
         return redirect()
             ->route('cart.index')
@@ -87,6 +91,7 @@ class CartController extends Controller
         ]);
 
         $this->cart->remove($product, (string) $validated['size']);
+        $this->cartReminders->syncFor($request->user());
 
         return redirect()
             ->route('cart.index')
@@ -102,6 +107,7 @@ class CartController extends Controller
             (string) $request->validated('code'),
             $this->cart->subtotalCents()
         );
+        $this->cartReminders->syncFor($request->user());
 
         return redirect()
             ->route('cart.index')
@@ -111,9 +117,10 @@ class CartController extends Controller
     /**
      * Remove the current discount code from the cart.
      */
-    public function removeDiscount(): RedirectResponse
+    public function removeDiscount(Request $request): RedirectResponse
     {
         $this->discountCodes->clear();
+        $this->cartReminders->syncFor($request->user());
 
         return redirect()
             ->route('cart.index')
