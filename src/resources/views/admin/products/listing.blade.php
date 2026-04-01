@@ -27,7 +27,7 @@
                     <div class="admin-product-main">
                         <div>
                             <p class="muted">{{ $product->category?->name ?? 'Uncategorized' }}</p>
-                            <h2>{{ $product->name }}</h2>
+                            <h2 style="color: #4ecba3;">{{ $product->name }}</h2>
                             <p class="muted">SKU: {{ $product->sku }}</p>
                             <p class="muted">
                                 Status:

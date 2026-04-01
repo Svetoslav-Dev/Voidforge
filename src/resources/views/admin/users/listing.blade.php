@@ -35,7 +35,7 @@
                                 <p style="margin: 0 0 0.25rem; font-weight: 700; color: #ffb86b;">Current user</p>
                             @endif
                             <p class="muted">{{ $user->email }}</p>
-                            <h2 style="margin: 0 0 0.4rem;">{{ $user->name }}</h2>
+                            <h2 style="margin: 0 0 0.4rem; color: #4ecba3;">{{ $user->name }}</h2>
                             <p class="muted">
                                 {{ $user->is_admin ? 'Admin' : 'Customer' }}
                                 ·

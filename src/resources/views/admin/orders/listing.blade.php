@@ -25,7 +25,7 @@
                 <article class="card" style="padding: 1.15rem 1.25rem;">
                     <div class="product-foot">
                         <div>
-                            <h2>
+                            <h2 style="color: #4ecba3;">
                                 Order #VF{{ $order->id }}
                                 @if ((int) $order->user_id === (int) auth()->id())
                                     <span style="color: #ffb86b; font-size: 0.8em;">- Current user</span>
@@ -46,6 +46,18 @@
                             <p class="muted">
                                 Payment:
                                 {{ $order->payments->first()?->provider ? ucfirst($order->payments->first()->provider) : 'Awaiting payment' }}
+                            </p>
+                            <p class="muted">
+                                Email:
+                                @if ($order->email_status === \App\Models\Order::EMAIL_STATUS_SENT)
+                                    Sent
+                                @elseif ($order->email_status === \App\Models\Order::EMAIL_STATUS_PENDING)
+                                    Pending
+                                @elseif ($order->email_status === \App\Models\Order::EMAIL_STATUS_FAILED)
+                                    <span style="color: #e05252;">Failed</span>
+                                @else
+                                    Not queued
+                                @endif
                             </p>
                         </div>
 

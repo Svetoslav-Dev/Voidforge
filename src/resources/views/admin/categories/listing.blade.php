@@ -40,7 +40,7 @@
                 <article class="card">
                     <div class="product-foot">
                         <div>
-                            <h2>{{ $category->name }}</h2>
+                            <h2 style="color: #4ecba3;">{{ $category->name }}</h2>
                             <p class="muted">Slug: {{ $category->slug }}</p>
                             <p class="muted">{{ $category->description }}</p>
                             <p class="muted">

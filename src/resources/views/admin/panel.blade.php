@@ -12,7 +12,6 @@
             <a class="button secondary" href="{{ route('admin.categories.index') }}">Browse categories</a>
             <a class="button secondary" href="{{ route('admin.users.index') }}">Browse users</a>
             <a class="button secondary" href="{{ route('admin.discount-codes.index') }}">Browse discounts</a>
-            <a class="button secondary" href="{{ route('admin.legal-requests.index') }}">Browse requests</a>
             <a class="button secondary" href="{{ route('admin.orders.index') }}">Browse orders</a>
         </div>
     </section>
@@ -39,15 +38,52 @@
         </article>
 
         <article class="card">
-            <h2 style="color: #d89a58;">Requests</h2>
-            <p class="muted">{{ $openLegalContactRequestCount }} open requests with {{ $legalContactRequestCount }} total submitted.</p>
-        </article>
-
-        <article class="card">
             <h2 style="color: #d89a58;">Orders</h2>
             <p class="muted">{{ $pendingOrderCount }} pending orders with {{ $archivedOrderCount }} archived.</p>
         </article>
     </section>
+
+    @if ($topShirts->isNotEmpty())
+    <section class="card" style="margin-top: 1.5rem;">
+        <h2 style="margin: 0 0 1.25rem; color: #d89a58;">Top selling shirts</h2>
+        @php($topMax = $topShirts->max('total_sold'))
+        <div style="display: grid; gap: 0.65rem;">
+            @foreach ($topShirts as $shirt)
+                @php($barPercent = $topMax > 0 ? ($shirt->total_sold / $topMax) * 100 : 0)
+                <div style="display: grid; gap: 0.3rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
+                        <span style="font-size: 0.9rem;">{{ $shirt->product_name }}</span>
+                        <span class="muted" style="font-size: 0.85rem; white-space: nowrap;">{{ $shirt->total_sold }} sold</span>
+                    </div>
+                    <div style="height: 0.45rem; border-radius: 999px; background: rgba(255,255,255,0.06);">
+                        <div style="height: 100%; border-radius: 999px; width: {{ $barPercent }}%; background: linear-gradient(90deg, rgba(63, 143, 165, 0.9) 0%, rgba(91, 231, 255, 0.7) 100%); transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        @if ($topCategories->isNotEmpty())
+            @php($catMax = $topCategories->max('total_sold'))
+            <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
+                <h2 style="margin: 0 0 1.25rem; color: #d89a58;">Top categories</h2>
+                <div style="display: grid; gap: 0.65rem;">
+                    @foreach ($topCategories as $category)
+                        @php($barPercent = $catMax > 0 ? ($category->total_sold / $catMax) * 100 : 0)
+                        <div style="display: grid; gap: 0.3rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
+                                <span style="font-size: 0.9rem;">{{ $category->category_name }}</span>
+                                <span class="muted" style="font-size: 0.85rem; white-space: nowrap;">{{ $category->total_sold }} sold</span>
+                            </div>
+                            <div style="height: 0.45rem; border-radius: 999px; background: rgba(255,255,255,0.06);">
+                                <div style="height: 100%; border-radius: 999px; width: {{ $barPercent }}%; background: linear-gradient(90deg, rgba(63, 143, 165, 0.9) 0%, rgba(91, 231, 255, 0.7) 100%); transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </section>
+    @endif
 
     <section class="card" style="margin-top: 1.5rem;">
         <div style="display: flex; justify-content: space-between; gap: 1rem; align-items: end; flex-wrap: wrap;">

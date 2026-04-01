@@ -45,7 +45,7 @@
                 <article class="card">
                     <div style="display:flex; justify-content:space-between; gap:1rem; align-items:start; flex-wrap:wrap;">
                         <div>
-                            <h2 style="margin:0;">{{ $discountCode->code }}</h2>
+                            <h2 style="margin:0; color:#4ecba3;">{{ $discountCode->code }}</h2>
                             @if ($discountCode->description)
                                 <p class="muted">{{ $discountCode->description }}</p>
                             @endif

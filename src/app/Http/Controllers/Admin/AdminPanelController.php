@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\DiscountCode;
-use App\Models\LegalContactRequest;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -58,6 +58,29 @@ class AdminPanelController extends Controller
                 ];
             });
 
+        $topShirts = OrderItem::query()
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', 'paid')
+            ->whereNull('orders.deleted_at')
+            ->selectRaw('product_name, SUM(quantity) as total_sold')
+            ->groupBy('product_name')
+            ->orderByDesc('total_sold')
+            ->limit(10)
+            ->get();
+
+        $topCategories = OrderItem::query()
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('orders.status', 'paid')
+            ->whereNull('orders.deleted_at')
+            ->whereNotNull('order_items.product_id')
+            ->selectRaw('categories.name as category_name, SUM(order_items.quantity) as total_sold')
+            ->groupBy('categories.id', 'categories.name')
+            ->orderByDesc('total_sold')
+            ->limit(3)
+            ->get();
+
         return view('admin.panel', [
             'categoryCount' => Category::query()->count(),
             'archivedCategoryCount' => Category::onlyTrashed()->count(),
@@ -70,14 +93,14 @@ class AdminPanelController extends Controller
             'userCount' => User::query()->count(),
             'archivedUserCount' => User::onlyTrashed()->count(),
             'discountCodeCount' => DiscountCode::query()->count(),
-            'legalContactRequestCount' => LegalContactRequest::query()->count(),
-            'openLegalContactRequestCount' => LegalContactRequest::query()->whereNull('resolved_at')->count(),
             'revenueChartYear' => $startOfYear->year,
             'revenueChartPreviousYear' => $startOfLastYear->year,
             'monthlyRevenue' => $monthlyRevenue,
             'monthlyRevenueLastYear' => $monthlyRevenueLastYear,
             'yearlyRevenueTotalCents' => $monthlyRevenue->sum('total_cents'),
             'yearlyRevenuePreviousTotalCents' => $monthlyRevenueLastYear->sum('total_cents'),
+            'topShirts' => $topShirts,
+            'topCategories' => $topCategories,
             'yearlyRevenueMaxCents' => max(
                 1,
                 (int) max($monthlyRevenue->max('total_cents'), $monthlyRevenueLastYear->max('total_cents'))
