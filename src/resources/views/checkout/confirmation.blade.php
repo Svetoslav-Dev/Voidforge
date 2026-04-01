@@ -5,15 +5,20 @@
     <section class="card hero">
         <div>
             <div class="checkout-complete-heading">
-            <h1>
+            <h1 style="color: #d89a58;">
                 @if ($order->placed_at)
-                    Order #VF{{ $order->id }} is {{ str_replace('_', ' ', $order->status) }}
+                    Order #VF{{ $order->id }} <span style="color: #edf3ff;">is {{ str_replace('_', ' ', $order->status) }}</span>
                 @else
-                    Checkout is {{ str_replace('_', ' ', $order->status) }}
+                    Checkout <span style="color: #edf3ff;">is {{ str_replace('_', ' ', $order->status) }}</span>
                 @endif
             </h1>
             @if ($order->placed_at)
-                <a class="button secondary" href="{{ route('checkout.download') }}">Download invoice</a>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    @auth
+                        <a class="button secondary" href="{{ route('orders.index') }}">Purchase history</a>
+                    @endauth
+                    <a class="button secondary" href="{{ route('checkout.download') }}">Download invoice</a>
+                </div>
             @endif
             </div>
             <p class="lead">
@@ -42,7 +47,7 @@
 
     <section class="grid two checkout-confirmation-grid" data-checkout-complete-cards>
         <article class="card checkout-shipment-card" data-checkout-shipment-card>
-            <h2>Shipment details</h2>
+            <h2 style="color: #d89a58;">Shipment details</h2>
             <p><strong>Name:</strong> <span class="muted">{{ $order->customer_name }}</span></p>
             <p><strong>Email:</strong> <span class="muted">{{ $order->customer_email }}</span></p>
             @if ($order->customer_phone)
@@ -66,7 +71,7 @@
         </article>
 
         <article class="card checkout-summary-card" data-checkout-summary-card>
-            <h2>Summary</h2>
+            <h2 style="color: #d89a58;">Summary</h2>
             @foreach ($order->items as $item)
                 <p class="summary-line plain-line">
                     <span>{{ $item->product_name }} · {{ $item->product_size }} x {{ $item->quantity }}</span>
@@ -85,7 +90,7 @@
             @endif
             <p class="summary-line plain-line">
                 <span>Status</span>
-                <strong>{{ ucwords(str_replace('_', ' ', $order->status)) }}</strong>
+                <strong style="{{ $order->status === 'paid' ? 'color: #7cf7c2;' : '' }}">{{ ucwords(str_replace('_', ' ', $order->status)) }}</strong>
             </p>
             @if ($paidPayment)
                 <p class="summary-line plain-line">
@@ -105,41 +110,25 @@
                         <button type="submit" class="button secondary">Back to address selection</button>
                     </form>
                 </div>
-
-                <div class="actions checkout-payment-actions">
-                    <div class="checkout-payment-option">
-                        <form method="POST" action="{{ route('stripe.checkout.store', $order) }}">
-                            @csrf
-                            <button type="submit">Pay with Stripe</button>
-                        </form>
-                        <p class="muted checkout-payment-note">
-                            Stripe Checkout may also show Apple Pay and Google Pay when your device, browser, and wallet setup support them.
-                        </p>
-                    </div>
-
-                    <form method="POST" action="{{ route('paypal.checkout.store', $order) }}">
-                        @csrf
-                        <button type="submit">Pay with PayPal</button>
-                    </form>
-                </div>
             @endif
 
-            @if ($order->placed_at)
-                <div class="actions checkout-complete-actions">
-                    @auth
-                        <a class="button secondary" href="{{ route('orders.index') }}">Purchase history</a>
-                    @endauth
-                </div>
-                <div class="checkout-disclosure">
-                    <p class="checkout-disclosure__title">Need help after the order?</p>
-                    <p class="muted">For support, returns, privacy, or complaints, use the trader contact page or reply to the order email.</p>
-                    <div class="checkout-disclosure__links">
-                        <a href="{{ route('legal.contact') }}">Contact and trader information</a>
-                        <a href="{{ route('legal.returns') }}">Returns</a>
-                        <a href="{{ route('legal.privacy') }}">Privacy</a>
-                    </div>
-                </div>
-            @endif
         </article>
     </section>
+
+    @if ($order->status !== 'paid')
+        <div class="actions checkout-payment-actions" style="margin-top: 1rem;">
+            <div class="checkout-payment-option">
+                <form method="POST" action="{{ route('stripe.checkout.store', $order) }}">
+                    @csrf
+                    <button type="submit">Pay with Stripe</button>
+                </form>
+                <p class="muted checkout-payment-note">Apple Pay and Google Pay are available at checkout.</p>
+            </div>
+
+            <form method="POST" action="{{ route('paypal.checkout.store', $order) }}">
+                @csrf
+                <button type="submit">Pay with PayPal</button>
+            </form>
+        </div>
+    @endif
 @endsection

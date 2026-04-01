@@ -116,16 +116,7 @@
                     <strong>{{ number_format(($discountSummary['total_cents'] ?? $subtotalCents) / 100, 2) }} EUR</strong>
                 </p>
                 <p class="muted">Shipping and payment are added in the next checkout step.</p>
-                <div class="checkout-disclosure">
-                    <p class="checkout-disclosure__title">Before shipping</p>
-                    <p class="muted">Review the store policies and trader details before continuing to the shipping step.</p>
-                    <div class="checkout-disclosure__links">
-                        <a href="{{ route('legal.terms') }}">Terms</a>
-                        <a href="{{ route('legal.privacy') }}">Privacy</a>
-                        <a href="{{ route('legal.returns') }}">Returns</a>
-                        <a href="{{ route('legal.contact') }}">Trader info</a>
-                    </div>
-                </div>
+
                 <div class="actions cart-summary-actions">
                     <a class="button cart-checkout-button" href="{{ route('checkout.index') }}">Confirm shipping address</a>
                 </div>

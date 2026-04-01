@@ -3,9 +3,9 @@
 @section('content')
     <section class="card hero">
         <div>
-            <h1>Confirm shipping and place the order.</h1>
+            <h1 style="color: #d89a58;">Confirm shipping</h1>
             <p class="lead">
-                This step prepares your payment. The order is only placed after Stripe or PayPal confirms it.
+                This step prepares your shipping address.
             </p>
         </div>
     </section>
@@ -214,17 +214,7 @@
                     <strong>{{ number_format(($discountSummary['total_cents'] ?? $subtotalCents) / 100, 2) }} EUR</strong>
                 </p>
                 <p class="muted">Payment is not collected yet. Stripe and PayPal are the next steps.</p>
-                <div class="checkout-disclosure">
-                    <p class="checkout-disclosure__title">Before you continue</p>
-                    <p class="muted">By placing the order, you confirm the shipping details above and continue to a payment page hosted by Stripe or PayPal.</p>
-                    <p class="muted">Review the store policies before payment:</p>
-                    <div class="checkout-disclosure__links">
-                        <a href="{{ route('legal.terms') }}">Terms</a>
-                        <a href="{{ route('legal.privacy') }}">Privacy</a>
-                        <a href="{{ route('legal.returns') }}">Returns</a>
-                        <a href="{{ route('legal.shipping') }}">Shipping</a>
-                    </div>
-                </div>
+
             </aside>
         </section>
     </div>

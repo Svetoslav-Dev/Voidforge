@@ -11,7 +11,7 @@
 
         <div class="grid two">
             <div class="card">
-                <h2>Account</h2>
+                <h2 style="color: #4ecba3;">Account</h2>
                 <p>{{ auth()->user()->name }}</p>
                 <p class="muted">Signed in as {{ auth()->user()->email }}</p>
 
@@ -50,7 +50,7 @@
             </div>
 
             <div class="card">
-                <h2>Receipts</h2>
+                <h2 style="color: #4ecba3;">Receipts</h2>
                 <p class="muted">Open previous orders to review purchased shirts, totals, and payment details.</p>
                 <div class="account-card-toolbar">
                     <div class="actions">
