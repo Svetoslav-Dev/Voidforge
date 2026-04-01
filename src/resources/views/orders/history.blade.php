@@ -10,13 +10,20 @@
         </div>
     </section>
 
-    <section class="list-stack" style="margin-top: 1.5rem;">
+    <div data-order-history>
+        <div class="chip-row" style="margin-top: 1.5rem;" data-order-history-chips>
+            <a class="chip {{ $activeStatus === null ? 'active' : '' }}" href="{{ route('orders.index') }}">All</a>
+            <a class="chip {{ $activeStatus === 'paid' ? 'active' : '' }}" href="{{ route('orders.index', ['status' => 'paid']) }}">Paid</a>
+            <a class="chip {{ $activeStatus === 'awaiting_payment' ? 'active' : '' }}" href="{{ route('orders.index', ['status' => 'awaiting_payment']) }}">Awaiting payment</a>
+        </div>
+
+    <section class="list-stack" style="margin-top: 1rem;">
         @forelse ($orders as $order)
             <article class="card">
                 <div class="receipt-header">
                     <div>
                         <p class="muted">Order #VF{{ $order->id }}</p>
-                        <h2 style="margin: 0 0 0.4rem;">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</h2>
+                        <h2 style="margin: 0 0 0.4rem; color: #4ecba3;">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</h2>
                         <p class="muted">
                             {{ optional($order->placed_at)->format('M d, Y') ?? $order->created_at->format('M d, Y') }}
                             · {{ $order->items->sum('quantity') }} shirts
@@ -61,4 +68,11 @@
             </article>
         @endforelse
     </section>
+
+    @if ($orders->hasPages())
+        <div class="pagination-wrap">
+            {{ $orders->links() }}
+        </div>
+    @endif
+    </div>
 @endsection

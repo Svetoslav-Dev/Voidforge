@@ -29,6 +29,6 @@
         <h2>Retention and customer rights</h2>
         <p>Customers should be able to request access, correction, or deletion where applicable, subject to accounting, security, and other lawful retention duties that still apply to completed orders or account records.</p>
         <p>The exact retention wording should still be reviewed against your final Bulgarian and EU legal obligations before launch.</p>
-        <p><a href="{{ route('legal.contact') }}">Open a privacy or support request</a></p>
+        <p><a href="{{ route('order.tracking') }}">Track an order</a></p>
     </section>
 @endsection

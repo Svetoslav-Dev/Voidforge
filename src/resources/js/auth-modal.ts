@@ -13,7 +13,7 @@ if (authModalRoots.length > 0) {
     });
 
     const setBodyScroll = (): void => {
-        const hasOpenModal = authModalRoots.some((root) => !root.hidden);
+        const hasOpenModal = authModalRoots.some((root) => !root.classList.contains('is-hidden'));
         document.body.style.overflow = hasOpenModal ? 'hidden' : '';
     };
 
@@ -21,11 +21,11 @@ if (authModalRoots.length > 0) {
         if (modalName) {
             const root = modalMap.get(modalName);
             if (root) {
-                root.hidden = true;
+                root.classList.add('is-hidden');
             }
         } else {
             authModalRoots.forEach((root) => {
-                root.hidden = true;
+                root.classList.add('is-hidden');
             });
         }
 
@@ -34,12 +34,17 @@ if (authModalRoots.length > 0) {
 
     const openModal = (modalName: string): void => {
         authModalRoots.forEach((root) => {
-            root.hidden = root.dataset.authModalRoot !== modalName;
+            root.classList.toggle('is-hidden', root.dataset.authModalRoot !== modalName);
         });
 
         const activeRoot = modalMap.get(modalName);
-        const firstField = activeRoot?.querySelector<HTMLInputElement>('input');
-        firstField?.focus();
+
+        requestAnimationFrame(() => {
+            const emailField = activeRoot?.querySelector<HTMLInputElement>('input[type="email"]');
+            const passwordField = activeRoot?.querySelector<HTMLInputElement>('input[type="password"]');
+            const focusTarget = emailField?.value ? (passwordField ?? emailField) : emailField;
+            focusTarget?.focus();
+        });
 
         setBodyScroll();
     };

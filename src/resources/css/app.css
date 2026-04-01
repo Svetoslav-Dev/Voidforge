@@ -133,7 +133,7 @@ a { color: inherit; }
     padding: 1.5rem;
 }
 
-.auth-modal[hidden] {
+.auth-modal.is-hidden {
     display: none;
 }
 
@@ -206,7 +206,7 @@ a { color: inherit; }
 
 .site-footer__grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem;
 }
 
@@ -1179,6 +1179,7 @@ button:disabled {
 
 .checkout-order-summary-title {
     margin: 0;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #d89a58;
     text-shadow: 0 0 14px rgba(216, 154, 88, 0.18);
@@ -1334,6 +1335,10 @@ button:disabled {
     margin: 0;
     line-height: 1.2;
     font-size: 1rem;
+}
+
+.checkout-selected-address-card p.checkout-selected-address-title {
+    font-size: 1.25rem;
 }
 
 .checkout-complete-actions {

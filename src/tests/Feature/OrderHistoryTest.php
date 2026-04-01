@@ -44,7 +44,7 @@ class OrderHistoryTest extends TestCase
             ->assertOk()
             ->assertSee('Order #VF'.$ownOrder->id)
             ->assertSee('Support and policy access')
-            ->assertSee(route('legal.contact'), false)
+            ->assertSee(route('order.tracking'), false)
             ->assertDontSee('Transaction: tx-own');
 
         $this->actingAs($user)

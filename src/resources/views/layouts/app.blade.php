@@ -117,10 +117,9 @@
 
             @guest
                 <div
-                    class="auth-modal"
+                    class="auth-modal @if ($authModal !== 'login') is-hidden @endif"
                     data-auth-modal-root="login"
                     @if ($authModal === 'login') data-auth-modal-open="true" @endif
-                    hidden
                 >
                     <div class="auth-modal__backdrop" data-auth-modal-close></div>
 
@@ -150,7 +149,7 @@
 
                             <div class="field">
                                 <label for="auth_modal_login_email">Email</label>
-                                <input id="auth_modal_login_email" name="email" type="email" value="{{ $authModal === 'login' ? old('email') : '' }}" required autocomplete="username">
+                                <input id="auth_modal_login_email" name="email" type="email" value="{{ $authModal === 'login' ? old('email') : (request()->cookie('remember_email') ?? '') }}" required autocomplete="username">
                             </div>
 
                             <div class="field">
@@ -160,7 +159,7 @@
 
                             <div class="auth-modal__footer">
                                 <label class="checkbox" for="auth_modal_remember">
-                                    <input id="auth_modal_remember" name="remember" type="checkbox" value="1" @checked($authModal === 'login' && old('remember'))>
+                                    <input id="auth_modal_remember" name="remember" type="checkbox" value="1" @checked(($authModal === 'login' && old('remember')) || request()->cookie('remember_email'))>
                                     <span>Remember me</span>
                                 </label>
 
@@ -173,10 +172,9 @@
                 </div>
 
                 <div
-                    class="auth-modal"
+                    class="auth-modal @if ($authModal !== 'register') is-hidden @endif"
                     data-auth-modal-root="register"
                     @if ($authModal === 'register') data-auth-modal-open="true" @endif
-                    hidden
                 >
                     <div class="auth-modal__backdrop" data-auth-modal-close></div>
 
@@ -235,29 +233,22 @@
             <footer class="card site-footer">
                 <div class="site-footer__grid">
                     <section class="site-footer__section">
-                        <p class="site-footer__title">VoidForgeStore</p>
-                        <p class="muted">Void-themed shirts, secure checkout, and account tools built for a compact storefront experience.</p>
-                    </section>
-
-                    <section class="site-footer__section">
                         <p class="site-footer__title">Store</p>
                         <a href="{{ route('products.index') }}">Browse shirts</a>
                         <a href="{{ route('cart.index') }}">Cart</a>
-                        <a href="{{ route('home') }}">VoidForgeStore info</a>
+                        <a href="{{ route('order.tracking') }}">Order tracking</a>
                     </section>
 
                     <section class="site-footer__section">
                         <p class="site-footer__title">Legal</p>
                         <a href="{{ route('legal.privacy') }}">Privacy Policy</a>
                         <a href="{{ route('legal.terms') }}">Terms and Conditions</a>
-                        <a href="{{ route('legal.returns') }}">Returns and Refunds</a>
                         <a href="{{ route('legal.shipping') }}">Shipping and Delivery</a>
                         <a href="{{ route('legal.cookies') }}">Cookie Policy</a>
                     </section>
 
                     <section class="site-footer__section">
                         <p class="site-footer__title">Contact</p>
-                        <a href="{{ route('legal.contact') }}">Trader information</a>
                         <p class="muted">{{ config('legal.support_email') }}</p>
                         <p class="muted">{{ config('legal.support_phone') }}</p>
                         <p class="muted">{{ config('legal.trader_address') }}</p>

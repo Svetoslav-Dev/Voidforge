@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -40,6 +41,12 @@ class AuthenticatedSessionController extends Controller
             'last_login_at' => now(),
         ])->save();
 
+        if ($request->boolean('remember')) {
+            Cookie::queue('remember_email', $request->input('email'), 60 * 24 * 365 * 5);
+        } else {
+            Cookie::forget('remember_email');
+        }
+
         return redirect()->intended(route('dashboard'));
     }
 
@@ -53,6 +60,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        return redirect()->route('products.index');
     }
 }

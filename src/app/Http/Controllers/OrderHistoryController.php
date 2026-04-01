@@ -15,12 +15,22 @@ class OrderHistoryController extends Controller
      */
     public function index(Request $request): View
     {
+        $status = $request->query('status');
+        $allowedStatuses = ['paid', 'awaiting_payment'];
+        $activeStatus = in_array($status, $allowedStatuses, true) ? $status : null;
+
+        $query = $request->user()
+            ->orders()
+            ->with(['items', 'payments'])
+            ->orderByRaw('COALESCE(placed_at, created_at) DESC');
+
+        if ($activeStatus !== null) {
+            $query->where('status', $activeStatus);
+        }
+
         return view('orders.history', [
-            'orders' => $request->user()
-                ->orders()
-                ->with(['items', 'payments'])
-                ->orderByRaw('COALESCE(placed_at, created_at) DESC')
-                ->get(),
+            'orders' => $query->paginate(10),
+            'activeStatus' => $activeStatus,
         ]);
     }
 

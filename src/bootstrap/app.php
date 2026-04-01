@@ -39,6 +39,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(function (AuthenticationException $exception, Request $request) {
+            if (! $request->expectsJson()) {
+                return redirect()->route('products.index');
+            }
+        });
+
         $exceptions->render(function (\Throwable $exception, Request $request) {
             if ($request->expectsJson()) {
                 return null;
@@ -50,7 +56,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if (
                 $exception instanceof ValidationException
-                || $exception instanceof AuthenticationException
                 || $exception instanceof AuthorizationException
             ) {
                 return null;

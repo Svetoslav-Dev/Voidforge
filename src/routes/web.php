@@ -14,8 +14,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LegalContactRequestController;
 use App\Http\Controllers\OrderHistoryController;
+use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\PayPalCheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StripeCheckoutController;
@@ -30,10 +30,8 @@ Route::view('/terms-and-conditions', 'legal.terms')->name('legal.terms');
 Route::view('/returns-and-refunds', 'legal.returns')->name('legal.returns');
 Route::view('/shipping-and-delivery', 'legal.shipping')->name('legal.shipping');
 Route::view('/cookies', 'legal.cookies')->name('legal.cookies');
-Route::view('/contact-and-trader-info', 'legal.contact')->name('legal.contact');
-Route::post('/contact-and-trader-info/request', LegalContactRequestController::class)
-    ->middleware('throttle:6,10')
-    ->name('legal.contact.request');
+Route::get('/order-tracking', [OrderTrackingController::class, 'index'])->name('order.tracking');
+Route::post('/order-tracking', [OrderTrackingController::class, 'search'])->middleware('throttle:10,5')->name('order.tracking.search');
 
 Route::get('/media/{path}', function (string $path) {
     abort_unless(Storage::disk('public')->exists($path), 404);
