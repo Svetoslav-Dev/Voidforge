@@ -14,6 +14,7 @@ class GenerateSitemap extends Command
     public function handle(): int
     {
         $baseUrl = rtrim(config('app.url'), '/');
+        $now = now()->toAtomString();
 
         $staticPaths = [
             '/products',
@@ -22,26 +23,27 @@ class GenerateSitemap extends Command
             '/returns-and-refunds',
             '/shipping-and-delivery',
             '/cookies',
-            '/contact-and-trader-info',
         ];
-
-        $urls = array_map(fn (string $path) => $baseUrl.$path, $staticPaths);
-
-        Product::publiclyVisible()->each(function (Product $product) use ($baseUrl, &$urls) {
-            $urls[] = $baseUrl.'/products/'.$product->slug;
-        });
 
         $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>');
 
-        foreach ($urls as $url) {
+        foreach ($staticPaths as $path) {
             $urlElement = $xml->addChild('url');
-            $urlElement->addChild('loc', htmlspecialchars($url));
+            $urlElement->addChild('loc', htmlspecialchars($baseUrl.$path));
+            $urlElement->addChild('lastmod', $now);
         }
 
+        Product::publiclyVisible()->each(function (Product $product) use ($baseUrl, $xml): void {
+            $urlElement = $xml->addChild('url');
+            $urlElement->addChild('loc', htmlspecialchars($baseUrl.'/products/'.$product->slug));
+            $urlElement->addChild('lastmod', $product->updated_at->toAtomString());
+        });
+
+        $count = count($xml->url);
         $path = public_path('sitemap.xml');
         $xml->asXML($path);
 
-        $this->info('Sitemap written to '.$path.' with '.count($urls).' URLs.');
+        $this->info('Sitemap written to '.$path.' with '.$count.' URLs.');
 
         return self::SUCCESS;
     }

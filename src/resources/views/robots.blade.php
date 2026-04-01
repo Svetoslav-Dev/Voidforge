@@ -13,4 +13,4 @@ Disallow: /paypal/
 Disallow: /password/
 Allow: /
 
-Sitemap: https://voidforgestore.com/sitemap.xml
+Sitemap: {{ url('/sitemap.xml') }}

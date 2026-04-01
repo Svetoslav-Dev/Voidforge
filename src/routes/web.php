@@ -25,6 +25,10 @@ use Illuminate\Support\Facades\Storage;
 Route::redirect('/', '/products');
 
 Route::view('/voidforge-info', 'welcome')->name('home');
+Route::get('/robots.txt', function () {
+    return response(view('robots'), 200, ['Content-Type' => 'text/plain']);
+});
+
 Route::view('/privacy-policy', 'legal.privacy')->name('legal.privacy');
 Route::view('/terms-and-conditions', 'legal.terms')->name('legal.terms');
 Route::view('/returns-and-refunds', 'legal.returns')->name('legal.returns');

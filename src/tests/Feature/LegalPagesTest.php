@@ -38,6 +38,7 @@ class LegalPagesTest extends TestCase
             ->assertOk()
             ->assertSee(route('legal.privacy'), false)
             ->assertSee(route('legal.terms'), false)
+            ->assertSee(route('legal.returns'), false)
             ->assertSee(route('legal.shipping'), false)
             ->assertSee(route('legal.cookies'), false)
             ->assertSee(route('order.tracking'), false);

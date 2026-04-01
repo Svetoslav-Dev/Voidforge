@@ -243,6 +243,7 @@
                         <p class="site-footer__title">Legal</p>
                         <a href="{{ route('legal.privacy') }}">Privacy Policy</a>
                         <a href="{{ route('legal.terms') }}">Terms and Conditions</a>
+                        <a href="{{ route('legal.returns') }}">Returns and Refunds</a>
                         <a href="{{ route('legal.shipping') }}">Shipping and Delivery</a>
                         <a href="{{ route('legal.cookies') }}">Cookie Policy</a>
                     </section>
