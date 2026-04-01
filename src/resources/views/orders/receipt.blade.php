@@ -7,7 +7,14 @@
                 @if ($order->placed_at)
                     <p class="muted">Receipt</p>
                 @endif
-                <h1>{{ $order->placed_at ? 'Order' : 'Pending Order' }} #VF{{ $order->id }}</h1>
+                <h1 style="color: #d89a58;">
+                    @if ($order->placed_at)
+                        Order
+                    @else
+                        <span style="color: #edf3ff;">Pending</span> Order
+                    @endif
+                    #VF{{ $order->id }}
+                </h1>
                 <p class="lead">
                     @if ($order->placed_at)
                         Purchased by {{ $order->customer_name }} on
@@ -19,10 +26,18 @@
             </div>
 
             <div style="text-align: right;">
-                <h2 class="{{ $order->status === 'awaiting_payment' ? 'pending-order-status' : '' }}" style="margin: 0;">
-                    {{ ucfirst(str_replace('_', ' ', $order->status)) }}
-                </h2>
-                <div class="actions" style="justify-content: flex-end;">
+                @php($completedPayments = $order->payments->where('status', 'paid'))
+                @if ($completedPayments->isNotEmpty())
+                    @foreach ($completedPayments as $payment)
+                        <h2 style="margin: 0; color: #4ecba3;">{{ ucfirst($payment->provider) }} · {{ strtoupper($payment->status) }}</h2>
+                        <p class="muted" style="margin: 0.25rem 0 0;">{{ number_format($payment->amount / 100, 2) }} EUR</p>
+                    @endforeach
+                @else
+                    <h2 style="margin: 0; color: #4ecba3;">
+                        {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                    </h2>
+                @endif
+                <div class="actions" style="justify-content: flex-end; margin-top: 0.75rem;">
                     <a class="button secondary" href="{{ route('orders.index') }}">Back to receipt history</a>
                 </div>
             </div>
@@ -31,7 +46,7 @@
 
     <section class="grid two" style="margin-top: 1.5rem;">
         <article class="card">
-            <h2>Shirts</h2>
+            <h2 style="color: #d89a58;">Shirts</h2>
             @foreach ($order->items as $item)
                 <div class="receipt-item">
                     <div class="product-visual">
@@ -62,7 +77,7 @@
         </article>
 
         <article class="card">
-            <h2>Receipt Details</h2>
+            <h2 style="color: #d89a58;">Receipt Details</h2>
             <p><strong>Name:</strong> <span class="muted">{{ $order->customer_name }}</span></p>
             <p><strong>Email:</strong> <span class="muted">{{ $order->customer_email }}</span></p>
             @if ($order->customer_phone)
@@ -84,21 +99,6 @@
             <p><strong>Postal code:</strong> <span class="muted">{{ $order->shipping_postal_code }}</span></p>
             <p><strong>Country:</strong> <span class="muted">{{ $order->shipping_country }}</span></p>
 
-            @php
-                $completedPayments = $order->payments->where('status', 'paid');
-            @endphp
-
-            @if ($completedPayments->isNotEmpty())
-                @foreach ($completedPayments as $payment)
-                    <p class="summary-line plain-line">
-                        <span>{{ ucfirst($payment->provider) }} · {{ $payment->status }}</span>
-                        <strong>{{ number_format($payment->amount / 100, 2) }} EUR</strong>
-                    </p>
-                @endforeach
-            @else
-                <p class="muted">No completed payment has been recorded for this order yet.</p>
-            @endif
-
             @if ($order->status !== 'paid')
                 <div class="actions" style="margin-top: 0.75rem;">
                     <form method="POST" action="{{ route('stripe.checkout.store', $order) }}">
@@ -113,16 +113,6 @@
                 </div>
             @endif
 
-            <div class="checkout-disclosure" style="margin-top: 1rem;">
-                <p class="checkout-disclosure__title">Support and policy access</p>
-                <p class="muted">Support: {{ config('legal.support_email') }}. Complaints: {{ config('legal.complaints_email') }}.</p>
-                <div class="checkout-disclosure__links">
-                    <a href="{{ route('order.tracking') }}">Track an order</a>
-                    <a href="{{ route('legal.returns') }}">Returns</a>
-                    <a href="{{ route('legal.privacy') }}">Privacy</a>
-                    <a href="{{ route('legal.terms') }}">Terms</a>
-                </div>
-            </div>
         </article>
     </section>
 @endsection

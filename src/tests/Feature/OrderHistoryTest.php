@@ -43,8 +43,6 @@ class OrderHistoryTest extends TestCase
             ->get(route('orders.show', ['orderReference' => 'VF'.$ownOrder->id]))
             ->assertOk()
             ->assertSee('Order #VF'.$ownOrder->id)
-            ->assertSee('Support and policy access')
-            ->assertSee(route('order.tracking'), false)
             ->assertDontSee('Transaction: tx-own');
 
         $this->actingAs($user)
@@ -81,7 +79,6 @@ class OrderHistoryTest extends TestCase
             ->get(route('orders.show', ['orderReference' => 'VF'.$order->id]))
             ->assertOk()
             ->assertSee('Order #VF'.$order->id)
-            ->assertSee('No completed payment has been recorded for this order yet.')
             ->assertSee('Pay with Stripe')
             ->assertSee('Pay with PayPal');
     }
