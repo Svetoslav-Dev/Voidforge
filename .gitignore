@@ -21,6 +21,7 @@
 /src/storage/framework/sessions/*
 /src/storage/framework/testing/*
 /src/storage/framework/views/*
+/src/public/sitemap.xml
 
 # Docker cache
 /docker/runtime/storage/logs/*
