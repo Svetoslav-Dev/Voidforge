@@ -1,14 +1,18 @@
 const consentRoot = document.querySelector<HTMLElement>('[data-cookie-consent]');
 const preferencesModal = document.querySelector<HTMLElement>('[data-cookie-preferences-modal]');
 const optionalToggle = document.querySelector<HTMLInputElement>('[data-cookie-preferences-optional]');
+const openPreferencesButtons = Array.from(document.querySelectorAll<HTMLElement>('[data-cookie-consent-open-preferences]'));
+const consentOptionButtons = Array.from(document.querySelectorAll<HTMLElement>('[data-cookie-consent-select]'));
+const savePreferencesButton = document.querySelector<HTMLElement>('[data-cookie-preferences-save]');
+const essentialPreferencesButton = document.querySelector<HTMLElement>('[data-cookie-preferences-essential]');
+const closePreferencesButtons = Array.from(document.querySelectorAll<HTMLElement>('[data-cookie-preferences-close]'));
 
 const consentStorageKey = 'voidforgestore.cookie-consent';
+const consentCookieName = 'voidforgestore_cookie_consent';
 
 type ConsentValue = 'all' | 'essential';
 
-function readConsent(): ConsentValue | null {
-    const value = window.localStorage.getItem(consentStorageKey);
-
+function parseConsentValue(value: string | null): ConsentValue | null {
     if (value === 'all' || value === 'essential') {
         return value;
     }
@@ -16,11 +20,68 @@ function readConsent(): ConsentValue | null {
     return null;
 }
 
+function readConsentCookie(): ConsentValue | null {
+    const cookie = document.cookie
+        .split('; ')
+        .find((entry) => entry.startsWith(`${consentCookieName}=`));
+
+    if (!cookie) {
+        return null;
+    }
+
+    const [, rawValue = ''] = cookie.split('=');
+
+    return parseConsentValue(decodeURIComponent(rawValue));
+}
+
+function writeConsentCookie(value: ConsentValue): void {
+    const maxAge = 60 * 60 * 24 * 365;
+    document.cookie = `${consentCookieName}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+}
+
+function readConsent(): ConsentValue | null {
+    try {
+        return parseConsentValue(window.localStorage.getItem(consentStorageKey)) ?? readConsentCookie();
+    } catch {
+        return readConsentCookie();
+    }
+}
+
+function persistConsent(value: ConsentValue): void {
+    try {
+        window.localStorage.setItem(consentStorageKey, value);
+    } catch {
+        // Fall back to a regular cookie when browser storage is unavailable.
+    }
+
+    try {
+        writeConsentCookie(value);
+    } catch {
+        // Ignore cookie write failures and still let the UI continue.
+    }
+}
+
+function syncWithServer(value: ConsentValue): void {
+    const token = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
+    fetch('/cookie-consent', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({ consent: value }),
+    }).catch(() => {
+        // Client-side consent is already stored; server sync is best-effort.
+    });
+}
+
 function writeConsent(value: ConsentValue): void {
-    window.localStorage.setItem(consentStorageKey, value);
     syncOptionalToggle(value);
     hideConsentBanner();
     closePreferences();
+    persistConsent(value);
+    syncWithServer(value);
 }
 
 function syncOptionalToggle(value: ConsentValue | null): void {
@@ -76,36 +137,44 @@ function initializeCookieConsent(): void {
         showConsentBanner();
     }
 
-    document.addEventListener('click', (event) => {
-        const target = event.target;
+    essentialPreferencesButton?.addEventListener('click', () => {
+        writeConsent('essential');
+    });
 
-        if (!(target instanceof HTMLElement)) {
-            return;
-        }
-
-        if (target.hasAttribute('data-cookie-consent-accept')) {
-            writeConsent('all');
-            return;
-        }
-
-        if (target.hasAttribute('data-cookie-consent-reject') || target.hasAttribute('data-cookie-preferences-essential')) {
-            writeConsent('essential');
-            return;
-        }
-
-        if (target.hasAttribute('data-cookie-consent-open-preferences')) {
+    openPreferencesButtons.forEach((button) => {
+        button.addEventListener('click', () => {
             openPreferences();
-            return;
-        }
+        });
+    });
 
-        if (target.hasAttribute('data-cookie-preferences-save')) {
-            writeConsent(optionalToggle?.checked ? 'all' : 'essential');
-            return;
-        }
+    consentOptionButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const action = button.dataset.cookieConsentSelect;
 
-        if (target.hasAttribute('data-cookie-preferences-close')) {
+            if (action === 'all') {
+                writeConsent('all');
+                return;
+            }
+
+            if (action === 'essential') {
+                writeConsent('essential');
+                return;
+            }
+
+            if (action === 'preferences') {
+                openPreferences();
+            }
+        });
+    });
+
+    savePreferencesButton?.addEventListener('click', () => {
+        writeConsent(optionalToggle?.checked ? 'all' : 'essential');
+    });
+
+    closePreferencesButtons.forEach((button) => {
+        button.addEventListener('click', () => {
             closePreferences();
-        }
+        });
     });
 }
 

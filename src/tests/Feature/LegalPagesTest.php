@@ -49,9 +49,21 @@ class LegalPagesTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('Cookie preferences')
-            ->assertSee('Read the Cookie Policy')
+            ->assertSee('cookie-consent__backdrop', false)
+            ->assertSee('VoidForgeStore uses cookies to keep the site working correctly. Here is what each option means:')
             ->assertSee('Essential only')
             ->assertSee('Accept all');
+    }
+
+    public function test_cookie_consent_route_persists_the_selected_choice(): void
+    {
+        $this->post(route('cookie-consent.store'), [
+            'consent' => 'all',
+            'return_to' => '/products',
+        ])
+            ->assertRedirect('/products')
+            ->assertSessionHas('voidforgestore_cookie_consent', 'all')
+            ->assertCookie('voidforgestore_cookie_consent', 'all');
     }
 
 }

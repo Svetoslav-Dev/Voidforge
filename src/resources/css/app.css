@@ -15,6 +15,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
     margin: 0;
@@ -321,16 +322,27 @@ a { color: inherit; }
 }
 
 .cookie-consent {
-    position: sticky;
-    bottom: 1rem;
-    z-index: 30;
-    margin: 1rem 0;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cookie-consent__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 8, 16, 0.74);
+    backdrop-filter: blur(4px);
 }
 
 .cookie-consent__panel {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+    width: min(42rem, calc(100vw - 2rem));
+    margin: auto;
+    display: grid;
     gap: 1rem;
     border-color: rgba(216, 154, 88, 0.34);
     background: rgba(16, 17, 27, 0.94);
@@ -350,6 +362,49 @@ a { color: inherit; }
 
 .cookie-consent__copy p {
     margin: 0;
+}
+
+.cookie-consent__options {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.cookie-consent__option {
+    display: grid;
+    gap: 0.2rem;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.02);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.cookie-consent__option:hover {
+    border-color: rgba(216, 154, 88, 0.42);
+    background: rgba(216, 154, 88, 0.06);
+    transform: none;
+}
+
+.cookie-consent__option:focus-visible {
+    outline: 2px solid rgba(216, 154, 88, 0.8);
+    outline-offset: 2px;
+}
+
+.cookie-consent__option strong {
+    color: #d89a58;
+}
+
+.cookie-consent__option .muted {
+    margin: 0;
+}
+
+.cookie-consent__option-link {
+    text-decoration: none;
 }
 
 .cookie-consent__copy a {
@@ -1446,12 +1501,11 @@ button:disabled {
     }
 
     .cookie-consent__panel {
-        flex-direction: column;
-        align-items: stretch;
+        width: min(42rem, calc(100vw - 1.5rem));
     }
 
     .cookie-consent__actions {
-        justify-content: stretch;
+        justify-content: flex-end;
     }
 
     .site-footer__grid {

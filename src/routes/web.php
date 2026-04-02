@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AdminLegalContactRequestController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CookieConsentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\OrderTrackingController;
@@ -34,6 +35,7 @@ Route::view('/terms-and-conditions', 'legal.terms')->name('legal.terms');
 Route::view('/returns-and-refunds', 'legal.returns')->name('legal.returns');
 Route::view('/shipping-and-delivery', 'legal.shipping')->name('legal.shipping');
 Route::view('/cookies', 'legal.cookies')->name('legal.cookies');
+Route::post('/cookie-consent', [CookieConsentController::class, 'store'])->name('cookie-consent.store');
 Route::get('/order-tracking', [OrderTrackingController::class, 'index'])->name('order.tracking');
 Route::post('/order-tracking', [OrderTrackingController::class, 'search'])->middleware('throttle:10,5')->name('order.tracking.search');
 

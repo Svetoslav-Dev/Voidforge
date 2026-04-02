@@ -1,5 +1,6 @@
 import '../css/app.css';
 import './bootstrap';
+import './cookie-consent';
 import './admin-category-modal';
 import './admin-discount-codes-page';
 import './admin-discount-code-modal';
@@ -11,7 +12,6 @@ import './account-payment-method-modal';
 import './account-delete-confirmation';
 import './checkout-address';
 import './checkout-complete-cards';
-import './cookie-consent';
 import './order-history';
 import './order-tracking';
 import './product-catalog';

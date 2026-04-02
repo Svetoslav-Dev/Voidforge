@@ -11,8 +11,14 @@
                 ? $baseTitle
                 : $baseTitle.' | '.$pageTitle;
             $authModal = old('auth_modal');
+            $cookieConsent = session('voidforgestore_cookie_consent', request()->cookie('voidforgestore_cookie_consent'));
+            $shouldShowCookieConsent = ! in_array($cookieConsent, ['all', 'essential'], true);
+            $cookiePreferencesUrl = request()->fullUrlWithQuery(['cookie_preferences' => 1]);
+            $cookieConsentReturnTo = request()->fullUrlWithoutQuery(['cookie_preferences']);
+            $shouldOpenCookiePreferences = $shouldShowCookieConsent && request()->boolean('cookie_preferences');
         @endphp
         <title>{{ $documentTitle }}</title>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         @vite('resources/js/app.ts')
     </head>
     <body>
@@ -60,23 +66,33 @@
                 <div class="status">{{ session('status') }}</div>
             @endif
 
-            <div class="cookie-consent" data-cookie-consent hidden>
+            <div class="cookie-consent" data-cookie-consent @if (! $shouldShowCookieConsent) hidden @endif>
+                <div class="cookie-consent__backdrop"></div>
+
                 <div class="card cookie-consent__panel">
                     <div class="cookie-consent__copy">
                         <p class="cookie-consent__title">Cookie preferences</p>
-                        <p class="muted">VoidForgeStore uses essential cookies for login, cart, checkout, and security. Optional cookies should only be enabled if you decide to allow them later.</p>
-                        <a href="{{ route('legal.cookies') }}">Read the Cookie Policy</a>
-                    </div>
+                        <p class="muted">VoidForgeStore uses cookies to keep the site working correctly. Here is what each option means:</p>
 
-                    <div class="cookie-consent__actions">
-                        <button class="button secondary" type="button" data-cookie-consent-open-preferences>Preferences</button>
-                        <button class="button secondary" type="button" data-cookie-consent-reject>Essential only</button>
-                        <button class="button" type="button" data-cookie-consent-accept>Accept all</button>
+                        <div class="cookie-consent__options">
+                            <button class="cookie-consent__option" type="button" data-cookie-consent-select="essential">
+                                <strong>Essential only</strong>
+                                <span class="muted">Only the cookies needed to run the site, login sessions, your cart, checkout, and security protections. Nothing else is stored.</span>
+                            </button>
+                            <button class="cookie-consent__option" type="button" data-cookie-consent-select="all">
+                                <strong>Accept all</strong>
+                                <span class="muted">Enables essential cookies plus optional ones reserved for future improvements such as analytics. These are currently inactive but will be used if enabled.</span>
+                            </button>
+                            <button class="cookie-consent__option" type="button" data-cookie-consent-select="preferences">
+                                <strong>Preferences</strong>
+                                <span class="muted">Opens a detailed panel where you can choose exactly which cookies to allow, turning optional cookies on or off individually before saving your choice.</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="cookie-preferences-modal" data-cookie-preferences-modal hidden>
+            <div class="cookie-preferences-modal" data-cookie-preferences-modal @if (! $shouldOpenCookiePreferences) hidden @endif>
                 <div class="cookie-preferences-modal__backdrop" data-cookie-preferences-close></div>
 
                 <section class="card cookie-preferences-modal__panel">
@@ -102,7 +118,7 @@
                                 <strong>Optional cookies</strong>
                                 <span class="muted">Reserved for future analytics or marketing tools. These are currently disabled by default.</span>
                             </span>
-                            <input type="checkbox" data-cookie-preferences-optional>
+                            <input type="checkbox" data-cookie-preferences-optional @checked($cookieConsent === 'all')>
                         </label>
                     </div>
 
