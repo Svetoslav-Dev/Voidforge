@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\EnsureCartIsNotEmpty;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureOrderOwnerOrAdmin;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -26,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 | Request::HEADER_X_FORWARDED_PORT
                 | Request::HEADER_X_FORWARDED_PROTO
         );
+
+        $middleware->web(append: [
+            SetLocale::class,
+        ]);
 
         $middleware->alias([
             'admin' => EnsureAdmin::class,

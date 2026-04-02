@@ -1,20 +1,17 @@
-@extends('layouts.app', ['title' => 'Cart | Voidforge'])
+@extends('layouts.app', ['title' => __('cart.page_title')])
 
 @section('content')
     <section class="card hero">
         <div>
-            <h1 style="color: #d89a58;">Review your shirt selection</h1>
-            <p class="lead">
-                This cart is stored in the session for now. Checkout comes next, so this page focuses on
-                quantity control and order subtotal.
-            </p>
+            <h1 style="color: #d89a58;">{{ __('cart.heading') }}</h1>
+            <p class="lead">{{ __('cart.lead') }}</p>
         </div>
     </section>
 
     @if ($items->isEmpty())
         <section class="card empty-state cart-empty-state">
-            <h2>Your cart is empty</h2>
-            <p class="muted">Browse the shirts and add a few pieces before moving to checkout.</p>
+            <h2>{{ __('cart.empty_heading') }}</h2>
+            <p class="muted">{{ __('cart.empty_hint') }}</p>
         </section>
     @else
         <section class="cart-layout">
@@ -27,11 +24,11 @@
                             </div>
 
                             <div>
-                                <p class="muted">{{ $item['product']->category?->name ?? 'Uncategorized' }}</p>
+                                <p class="muted">{{ $item['product']->category?->name ?? __('products.uncategorized') }}</p>
                                 <h2>{{ $item['product']->name }}</h2>
-                                <p class="muted">SKU: {{ $item['product']->sku }}</p>
-                                <p class="muted">Size: {{ $item['size'] }}</p>
-                                <p class="cart-item-price">{{ number_format($item['product']->price_cents / 100, 2) }} EUR each</p>
+                                <p class="muted">{{ __('cart.sku', ['sku' => $item['product']->sku]) }}</p>
+                                <p class="muted">{{ __('cart.size', ['size' => $item['size']]) }}</p>
+                                <p class="cart-item-price">{{ __('cart.price_each', ['price' => number_format($item['product']->price_cents / 100, 2)]) }}</p>
                             </div>
                         </div>
 
@@ -40,7 +37,7 @@
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="size" value="{{ $item['size'] }}">
-                                <label for="quantity-{{ $item['key'] }}">Qty</label>
+                                <label for="quantity-{{ $item['key'] }}">{{ __('cart.qty') }}</label>
                                 <input
                                     id="quantity-{{ $item['key'] }}"
                                     name="quantity"
@@ -49,14 +46,14 @@
                                     max="{{ min(99, $item['product']->stock) }}"
                                     value="{{ $item['quantity'] }}"
                                 >
-                                <button type="submit">Update</button>
+                                <button type="submit">{{ __('cart.update') }}</button>
                             </form>
 
                             <form method="POST" action="{{ route('cart.destroy', $item['product']) }}">
                                 @csrf
                                 @method('DELETE')
                                 <input type="hidden" name="size" value="{{ $item['size'] }}">
-                                <button class="button secondary" type="submit">Remove</button>
+                                <button class="button secondary" type="submit">{{ __('cart.remove') }}</button>
                             </form>
                         </div>
                     </article>
@@ -64,14 +61,14 @@
             </div>
 
             <aside class="card summary-card cart-summary-card">
-                <p class="cart-order-summary-title">Order Summary</p>
+                <p class="cart-order-summary-title">{{ __('cart.order_summary') }}</p>
                 <form method="POST" action="{{ route('cart.discount.store') }}">
                     @csrf
                     <div class="field" style="margin-bottom: 0.5rem;">
-                        <label for="discount_code">Discount code</label>
+                        <label for="discount_code">{{ __('cart.discount_code') }}</label>
                         <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <input id="discount_code" name="code" type="text" value="{{ old('code', $discountSummary['code'] ?? '') }}" placeholder="WELCOME10">
-                            <button type="submit">Apply</button>
+                            <input id="discount_code" name="code" type="text" value="{{ old('code', $discountSummary['code'] ?? '') }}" placeholder="{{ __('cart.discount_placeholder') }}">
+                            <button type="submit">{{ __('cart.apply') }}</button>
                         </div>
                         @error('code')<p class="muted">{{ $message }}</p>@enderror
                     </div>
@@ -79,11 +76,11 @@
 
                 @if ($discountSummary)
                     <div class="actions" style="margin-top: 0;">
-                        <p class="discount-applied-label" style="margin:0;">Applied code {{ $discountSummary['code'] }}</p>
+                        <p class="discount-applied-label" style="margin:0;">{{ __('cart.discount_applied', ['code' => $discountSummary['code']]) }}</p>
                         <form method="POST" action="{{ route('cart.discount.destroy') }}">
                             @csrf
                             @method('DELETE')
-                            <button class="button danger" type="submit">Remove</button>
+                            <button class="button danger" type="submit">{{ __('cart.remove') }}</button>
                         </form>
                     </div>
                 @endif
@@ -103,22 +100,22 @@
                 @endforeach
                 @if ($discountSummary)
                     <p class="summary-line plain-line discount-summary-line">
-                        <span>Discount · {{ $discountSummary['code'] }}</span>
+                        <span>{{ __('cart.discount_line', ['code' => $discountSummary['code']]) }}</span>
                         <strong>-{{ number_format($discountSummary['discount_cents'] / 100, 2) }} EUR</strong>
                     </p>
                 @endif
                 <p class="summary-line">
-                    <span>Subtotal</span>
+                    <span>{{ __('cart.subtotal') }}</span>
                     <strong>{{ number_format($subtotalCents / 100, 2) }} EUR</strong>
                 </p>
                 <p class="summary-line total-line">
-                    <span>Total</span>
+                    <span>{{ __('cart.total') }}</span>
                     <strong>{{ number_format(($discountSummary['total_cents'] ?? $subtotalCents) / 100, 2) }} EUR</strong>
                 </p>
-                <p class="muted">Shipping and payment are added in the next checkout step.</p>
+                <p class="muted">{{ __('cart.shipping_note') }}</p>
 
                 <div class="actions cart-summary-actions">
-                    <a class="button cart-checkout-button" href="{{ route('checkout.index') }}">Confirm shipping address</a>
+                    <a class="button cart-checkout-button" href="{{ route('checkout.index') }}">{{ __('cart.continue_to_shipping') }}</a>
                 </div>
             </aside>
         </section>

@@ -1,0 +1,63 @@
+<?php
+
+return [
+    'page_title' => 'Плащане | VoidForgeStore',
+    'heading' => 'Потвърдете доставката',
+    'lead' => 'Тази стъпка подготвя вашия адрес за доставка.',
+    'error_cart' => 'Плащането не можа да бъде завършено.',
+
+    'saved_address_label' => 'Запазен адрес за доставка',
+    'use_address' => 'Използвай адрес',
+    'add_new_address' => 'Добави нов адрес',
+
+    'selected_address_title' => 'Избран адрес за доставка:',
+    'field_name' => 'Пълно име',
+    'field_email' => 'Имейл',
+    'field_phone' => 'Телефон',
+    'field_country' => 'Код на държава',
+    'field_address_1' => 'Адрес ред 1',
+    'field_address_2' => 'Адрес ред 2',
+    'field_city' => 'Град',
+    'field_state' => 'Област / Регион',
+    'field_postal_code' => 'Пощенски код',
+
+    'label_name' => 'Име:',
+    'label_email' => 'Имейл:',
+    'label_phone' => 'Телефон:',
+    'label_address' => 'Адрес:',
+    'label_city' => 'Град:',
+    'label_state' => 'Област:',
+    'label_postal_code' => 'Пощенски код:',
+    'label_country' => 'Държава:',
+
+    'back_to_cart' => 'Обратно към количката',
+    'place_order' => 'Направи поръчка',
+
+    'order_summary_title' => 'Обобщение на поръчката:',
+    'discount_code' => 'Код за отстъпка',
+    'discount_placeholder' => 'WELCOME10',
+    'discount_applied' => 'Приложен код :code',
+    'shipping_line' => 'Доставка',
+    'subtotal' => 'Междинна сума',
+    'total' => 'Общо',
+    'discount_line' => 'Отстъпка · :code',
+    'payment_note' => 'Плащането все още не е извършено. Следващите стъпки са Stripe и PayPal.',
+
+    'confirmation_order_placed' => 'Поръчка #VF:id е :status',
+    'confirmation_checkout' => 'Плащането е :status',
+    'confirmation_paid' => 'Поръчката е направена и плащането е потвърдено.',
+    'confirmation_no_payment' => 'Поръчката все още не е направена. Ще бъде направена след потвърждение от Stripe или PayPal.',
+    'confirmation_awaiting' => 'Поръчката е създадена и изчаква потвърждение за плащане.',
+    'payment_error' => 'Плащането не можа да бъде стартирано.',
+    'purchase_history' => 'История на покупките',
+    'download_invoice' => 'Изтегли фактура',
+
+    'shipment_details' => 'Данни за доставка',
+    'summary' => 'Обобщение',
+    'label_status' => 'Статус',
+    'label_payment_method' => 'Начин на плащане',
+    'back_to_address' => 'Обратно към избор на адрес',
+    'pay_stripe' => 'Плати със Stripe',
+    'pay_paypal' => 'Плати с PayPal',
+    'apple_google_pay_note' => 'Apple Pay и Google Pay са налични при плащане.',
+];

@@ -1,18 +1,15 @@
-@extends('layouts.app', ['title' => 'Shirts | Voidforge'])
+@extends('layouts.app', ['title' => __('products.page_title')])
 
 @section('content')
     <section class="card hero">
         <div>
-            <h1 style="color: #d89a58;">Browse Shirts</h1>
-            <p class="lead">
-                Browse the current shirts by category. The demo lineup now carries more shirts so the
-                storefront feels closer to a real first release.
-            </p>
+            <h1 style="color: #d89a58;">{{ __('products.heading') }}</h1>
+            <p class="lead">{{ __('products.lead') }}</p>
         </div>
 
         <div data-product-catalog>
             <div class="chip-row" style="margin-top: 0.8rem;" data-product-catalog-chips>
-                <a class="chip {{ $selectedCategory ? '' : 'active' }}" href="{{ route('products.index') }}">All</a>
+                <a class="chip {{ $selectedCategory ? '' : 'active' }}" href="{{ route('products.index') }}">{{ __('products.category_all') }}</a>
                 @foreach ($categories as $category)
                     <a
                         class="chip {{ $selectedCategory === $category->slug ? 'active' : '' }}"
@@ -32,7 +29,7 @@
                             </div>
 
                             <div class="product-meta">
-                                <p class="muted">{{ $product->category?->name ?? 'Uncategorized' }}</p>
+                                <p class="muted">{{ $product->category?->name ?? __('products.uncategorized') }}</p>
                                 <h2>{{ $product->name }}</h2>
                                 <p class="muted">{{ $product->description }}</p>
                             </div>
@@ -49,14 +46,14 @@
                                     </div>
 
                                     <div class="actions product-card-actions">
-                                        <a class="button secondary" href="{{ route('products.show', $product) }}">View shirt</a>
+                                        <a class="button secondary" href="{{ route('products.show', $product) }}">{{ __('products.view_shirt') }}</a>
 
                                         @if ($product->stock > 0 && $product->defaultShirtSize())
                                             <form method="POST" action="{{ route('cart.store', $product) }}" data-ajax-add-to-cart>
                                                 @csrf
                                                 <input type="hidden" name="quantity" value="1">
                                                 <input type="hidden" name="size" value="{{ $product->defaultShirtSize() }}">
-                                                <button type="submit">Add to cart</button>
+                                                <button type="submit">{{ __('products.add_to_cart') }}</button>
                                             </form>
                                         @endif
                                     </div>
@@ -65,8 +62,8 @@
                         </article>
                     @empty
                         <div class="card">
-                            <h2>No shirts found</h2>
-                            <p class="muted">Try another category or seed the demo shirts again.</p>
+                            <h2>{{ __('products.no_shirts_found') }}</h2>
+                            <p class="muted">{{ __('products.no_shirts_found_hint') }}</p>
                         </div>
                     @endforelse
                 </section>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,19 +21,19 @@
                 <div class="nav-group" data-nav-group>
                     <a class="brand" href="{{ route('home') }}">
                         <span class="brand-mark" aria-hidden="true"></span>
-                        <span class="brand-text">VoidForgeStore</span>
+                        <span class="brand-text">{{ __('ui.brand') }}</span>
                     </a>
-                    <a class="button secondary" href="{{ route('products.index') }}">Browse Shirts</a>
+                    <a class="button secondary" href="{{ route('products.index') }}">{{ __('ui.browse_shirts') }}</a>
                     @auth
                         @if (! auth()->user()->is_admin)
-                            <a class="button secondary" href="{{ route('dashboard') }}">My Account</a>
+                            <a class="button secondary" href="{{ route('dashboard') }}">{{ __('ui.my_account') }}</a>
                         @else
-                            <a class="button secondary" href="{{ route('dashboard') }}">My Account</a>
-                            <a class="button secondary" href="{{ route('admin.panel') }}">Admin</a>
+                            <a class="button secondary" href="{{ route('dashboard') }}">{{ __('ui.my_account') }}</a>
+                            <a class="button secondary" href="{{ route('admin.panel') }}">{{ __('ui.admin') }}</a>
                         @endif
                     @endauth
                     @if (($cartItemCount ?? 0) > 0)
-                        <a class="button secondary" href="{{ route('cart.index') }}" data-cart-link>Cart ({{ $cartItemCount }})</a>
+                        <a class="button secondary" href="{{ route('cart.index') }}" data-cart-link>{{ __('ui.cart_count', ['count' => $cartItemCount]) }}</a>
                     @endif
                 </div>
 
@@ -42,17 +42,23 @@
                         <details class="account-menu">
                             <summary class="button account-menu__toggle">{{ auth()->user()->name }}</summary>
                             <div class="card account-menu__panel">
-                                <p class="muted account-menu__label">Signed in as {{ auth()->user()->email }}</p>
+                                <p class="muted account-menu__label">{{ __('ui.signed_in_as', ['email' => auth()->user()->email]) }}</p>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit">Logout</button>
+                                    <button type="submit">{{ __('ui.logout') }}</button>
                                 </form>
                             </div>
                         </details>
                     @else
-                        <button class="button secondary" type="button" data-auth-modal-trigger="login">Login</button>
-                        <button class="button" type="button" data-auth-modal-trigger="register">Create Account</button>
+                        <button class="button secondary" type="button" data-auth-modal-trigger="login">{{ __('ui.login') }}</button>
+                        <button class="button" type="button" data-auth-modal-trigger="register">{{ __('ui.create_account') }}</button>
                     @endauth
+
+                    <form method="POST" action="{{ route('language.switch') }}" class="language-switcher">
+                        @csrf
+                        <button type="submit" name="locale" value="en" class="button secondary language-switcher__btn {{ app()->getLocale() === 'en' ? 'is-active' : '' }}">EN</button>
+                        <button type="submit" name="locale" value="bg" class="button secondary language-switcher__btn {{ app()->getLocale() === 'bg' ? 'is-active' : '' }}">BG</button>
+                    </form>
                 </div>
             </nav>
 
@@ -61,17 +67,33 @@
             @endif
 
             <div class="cookie-consent" data-cookie-consent hidden>
+                <div class="cookie-consent__backdrop"></div>
+
                 <div class="card cookie-consent__panel">
                     <div class="cookie-consent__copy">
-                        <p class="cookie-consent__title">Cookie preferences</p>
-                        <p class="muted">VoidForgeStore uses essential cookies for login, cart, checkout, and security. Optional cookies should only be enabled if you decide to allow them later.</p>
-                        <a href="{{ route('legal.cookies') }}">Read the Cookie Policy</a>
+                        <p class="cookie-consent__title">{{ __('cookies.title') }}</p>
+                        <p class="muted">{{ __('cookies.intro') }}</p>
+
+                        <div class="cookie-consent__options">
+                            <div class="cookie-consent__option">
+                                <strong>{{ __('cookies.essential_only_title') }}</strong>
+                                <span class="muted">{{ __('cookies.essential_only_description') }}</span>
+                            </div>
+                            <div class="cookie-consent__option">
+                                <strong>{{ __('cookies.accept_all_title') }}</strong>
+                                <span class="muted">{{ __('cookies.accept_all_description') }}</span>
+                            </div>
+                            <div class="cookie-consent__option">
+                                <strong>{{ __('cookies.preferences_title') }}</strong>
+                                <span class="muted">{{ __('cookies.preferences_description') }}</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="cookie-consent__actions">
-                        <button class="button secondary" type="button" data-cookie-consent-open-preferences>Preferences</button>
-                        <button class="button secondary" type="button" data-cookie-consent-reject>Essential only</button>
-                        <button class="button" type="button" data-cookie-consent-accept>Accept all</button>
+                        <button class="button secondary" type="button" data-cookie-consent-open-preferences>{{ __('cookies.btn_preferences') }}</button>
+                        <button class="button secondary" type="button" data-cookie-consent-reject>{{ __('cookies.btn_essential_only') }}</button>
+                        <button class="button" type="button" data-cookie-consent-accept>{{ __('cookies.btn_accept_all') }}</button>
                     </div>
                 </div>
             </div>
@@ -82,33 +104,33 @@
                 <section class="card cookie-preferences-modal__panel">
                     <div class="cookie-preferences-modal__header">
                         <div>
-                            <h2>Cookie preferences</h2>
-                            <p class="muted">Essential cookies stay enabled because the storefront depends on them. Optional cookies are off unless you choose otherwise.</p>
+                            <h2>{{ __('cookies.modal_title') }}</h2>
+                            <p class="muted">{{ __('cookies.modal_subtitle') }}</p>
                         </div>
-                        <button class="button danger" type="button" data-cookie-preferences-close>Close</button>
+                        <button class="button danger" type="button" data-cookie-preferences-close>{{ __('cookies.modal_close') }}</button>
                     </div>
 
                     <div class="cookie-preferences-modal__body">
                         <label class="cookie-preferences-option">
                             <span>
-                                <strong>Essential cookies</strong>
-                                <span class="muted">Required for authentication, cart persistence, checkout, session handling, and security protections.</span>
+                                <strong>{{ __('cookies.essential_title') }}</strong>
+                                <span class="muted">{{ __('cookies.essential_description') }}</span>
                             </span>
                             <input type="checkbox" checked disabled>
                         </label>
 
                         <label class="cookie-preferences-option">
                             <span>
-                                <strong>Optional cookies</strong>
-                                <span class="muted">Reserved for future analytics or marketing tools. These are currently disabled by default.</span>
+                                <strong>{{ __('cookies.optional_title') }}</strong>
+                                <span class="muted">{{ __('cookies.optional_description') }}</span>
                             </span>
                             <input type="checkbox" data-cookie-preferences-optional>
                         </label>
                     </div>
 
                     <div class="cookie-preferences-modal__actions">
-                        <button class="button secondary" type="button" data-cookie-preferences-essential>Use essential only</button>
-                        <button class="button" type="button" data-cookie-preferences-save>Save preferences</button>
+                        <button class="button secondary" type="button" data-cookie-preferences-essential>{{ __('cookies.btn_use_essential') }}</button>
+                        <button class="button" type="button" data-cookie-preferences-save>{{ __('cookies.btn_save') }}</button>
                     </div>
                 </section>
             </div>
@@ -126,15 +148,15 @@
                     <section class="card auth-modal__panel is-active">
                         <div class="auth-modal__header">
                             <div>
-                                <h2>Welcome back</h2>
-                                <p class="muted">Sign in to manage your account, orders, and checkout details.</p>
+                                <h2>{{ __('auth.login_title') }}</h2>
+                                <p class="muted">{{ __('auth.login_subtitle') }}</p>
                             </div>
-                            <button class="button danger" type="button" data-auth-modal-close>Close</button>
+                            <button class="button danger" type="button" data-auth-modal-close>{{ __('ui.close') }}</button>
                         </div>
 
                         @if ($authModal === 'login' && $errors->any())
                             <div class="errors">
-                                <strong>Login failed.</strong>
+                                <strong>{{ __('auth.login_failed') }}</strong>
                                 <ul>
                                     @foreach ($errors->all() as $error)
                                         <li>{{ $error }}</li>
@@ -148,23 +170,23 @@
                             <input type="hidden" name="auth_modal" value="login">
 
                             <div class="field">
-                                <label for="auth_modal_login_email">Email</label>
+                                <label for="auth_modal_login_email">{{ __('auth.field_email') }}</label>
                                 <input id="auth_modal_login_email" name="email" type="email" value="{{ $authModal === 'login' ? old('email') : (request()->cookie('remember_email') ?? '') }}" required autocomplete="username">
                             </div>
 
                             <div class="field">
-                                <label for="auth_modal_login_password">Password</label>
+                                <label for="auth_modal_login_password">{{ __('auth.field_password') }}</label>
                                 <input id="auth_modal_login_password" name="password" type="password" required autocomplete="current-password">
                             </div>
 
                             <div class="auth-modal__footer">
                                 <label class="checkbox" for="auth_modal_remember">
                                     <input id="auth_modal_remember" name="remember" type="checkbox" value="1" @checked(($authModal === 'login' && old('remember')) || request()->cookie('remember_email'))>
-                                    <span>Remember me</span>
+                                    <span>{{ __('auth.remember_me') }}</span>
                                 </label>
 
                                 <div class="auth-modal__actions">
-                                    <button type="submit">Login</button>
+                                    <button type="submit">{{ __('auth.login_button') }}</button>
                                 </div>
                             </div>
                         </form>
@@ -181,15 +203,15 @@
                     <section class="card auth-modal__panel is-active">
                         <div class="auth-modal__header">
                             <div>
-                                <h2>Create your account</h2>
-                                <p class="muted">Register with a secure password so you can shop, track orders, and return to checkout later.</p>
+                                <h2>{{ __('auth.register_title') }}</h2>
+                                <p class="muted">{{ __('auth.register_subtitle') }}</p>
                             </div>
-                            <button class="button danger" type="button" data-auth-modal-close>Close</button>
+                            <button class="button danger" type="button" data-auth-modal-close>{{ __('ui.close') }}</button>
                         </div>
 
                         @if ($authModal === 'register' && $errors->any())
                             <div class="errors">
-                                <strong>Registration failed.</strong>
+                                <strong>{{ __('auth.register_failed') }}</strong>
                                 <ul>
                                     @foreach ($errors->all() as $error)
                                         <li>{{ $error }}</li>
@@ -203,27 +225,27 @@
                             <input type="hidden" name="auth_modal" value="register">
 
                             <div class="field">
-                                <label for="auth_modal_register_name">Name</label>
+                                <label for="auth_modal_register_name">{{ __('auth.field_name') }}</label>
                                 <input id="auth_modal_register_name" name="name" type="text" value="{{ $authModal === 'register' ? old('name') : '' }}" required autocomplete="name">
                             </div>
 
                             <div class="field">
-                                <label for="auth_modal_register_email">Email</label>
+                                <label for="auth_modal_register_email">{{ __('auth.field_email') }}</label>
                                 <input id="auth_modal_register_email" name="email" type="email" value="{{ $authModal === 'register' ? old('email') : '' }}" required autocomplete="username">
                             </div>
 
                             <div class="field">
-                                <label for="auth_modal_register_password">Password</label>
+                                <label for="auth_modal_register_password">{{ __('auth.field_password') }}</label>
                                 <input id="auth_modal_register_password" name="password" type="password" required autocomplete="new-password">
                             </div>
 
                             <div class="field">
-                                <label for="auth_modal_register_password_confirmation">Confirm password</label>
+                                <label for="auth_modal_register_password_confirmation">{{ __('auth.field_confirm_password') }}</label>
                                 <input id="auth_modal_register_password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password">
                             </div>
 
                             <div class="auth-modal__actions">
-                                <button type="submit">Create Account</button>
+                                <button type="submit">{{ __('auth.register_button') }}</button>
                             </div>
                         </form>
                     </section>
@@ -233,39 +255,39 @@
             <footer class="card site-footer">
                 <div class="site-footer__grid">
                     <section class="site-footer__section">
-                        <p class="site-footer__title">Store</p>
-                        <a href="{{ route('products.index') }}">Browse shirts</a>
-                        <a href="{{ route('cart.index') }}">Cart</a>
-                        <a href="{{ route('order.tracking') }}">Order tracking</a>
+                        <p class="site-footer__title">{{ __('ui.footer_store') }}</p>
+                        <a href="{{ route('products.index') }}">{{ __('ui.footer_browse_shirts') }}</a>
+                        <a href="{{ route('cart.index') }}">{{ __('ui.footer_cart') }}</a>
+                        <a href="{{ route('order.tracking') }}">{{ __('ui.footer_order_tracking') }}</a>
                     </section>
 
                     <section class="site-footer__section">
-                        <p class="site-footer__title">Legal</p>
-                        <a href="{{ route('legal.privacy') }}">Privacy Policy</a>
-                        <a href="{{ route('legal.terms') }}">Terms and Conditions</a>
-                        <a href="{{ route('legal.returns') }}">Returns and Refunds</a>
-                        <a href="{{ route('legal.shipping') }}">Shipping and Delivery</a>
-                        <a href="{{ route('legal.cookies') }}">Cookie Policy</a>
+                        <p class="site-footer__title">{{ __('ui.footer_legal') }}</p>
+                        <a href="{{ route('legal.privacy') }}">{{ __('ui.footer_privacy_policy') }}</a>
+                        <a href="{{ route('legal.terms') }}">{{ __('ui.footer_terms') }}</a>
+                        <a href="{{ route('legal.returns') }}">{{ __('ui.footer_returns') }}</a>
+                        <a href="{{ route('legal.shipping') }}">{{ __('ui.footer_shipping') }}</a>
+                        <a href="{{ route('legal.cookies') }}">{{ __('ui.footer_cookies') }}</a>
                     </section>
 
                     <section class="site-footer__section">
-                        <p class="site-footer__title">Contact</p>
+                        <p class="site-footer__title">{{ __('ui.footer_contact') }}</p>
                         <p class="muted">{{ config('legal.support_email') }}</p>
                         <p class="muted">{{ config('legal.support_phone') }}</p>
                         <p class="muted">{{ config('legal.trader_address') }}</p>
                     </section>
 
                     <section class="site-footer__section">
-                        <p class="site-footer__title">Payments</p>
-                        <p class="muted">Stripe and PayPal hosted payments. Card data is never stored locally.</p>
+                        <p class="site-footer__title">{{ __('ui.footer_payments') }}</p>
+                        <p class="muted">{{ __('ui.footer_payments_description') }}</p>
                     </section>
                 </div>
 
                 <div class="site-footer__bottom">
-                    <p class="muted">Secure checkout with Laravel validation, CSRF protection, hashed passwords, server-side order handling, and hosted Stripe and PayPal payments.</p>
+                    <p class="muted">{{ __('ui.footer_security') }}</p>
                     <div class="site-footer__bottom-links">
-                        <button class="button secondary site-footer__button" type="button" data-cookie-consent-open-preferences>Cookie preferences</button>
-                        <p class="muted">© {{ now()->year }} VoidForgeStore</p>
+                        <button class="button secondary site-footer__button" type="button" data-cookie-consent-open-preferences>{{ __('ui.footer_cookie_preferences') }}</button>
+                        <p class="muted">{{ __('ui.footer_copyright', ['year' => now()->year]) }}</p>
                     </div>
                 </div>
             </footer>

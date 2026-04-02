@@ -1,0 +1,63 @@
+<?php
+
+return [
+    'page_title' => 'Checkout | VoidForgeStore',
+    'heading' => 'Confirm shipping',
+    'lead' => 'This step prepares your shipping address.',
+    'error_cart' => 'Checkout could not be completed.',
+
+    'saved_address_label' => 'Saved shipping address',
+    'use_address' => 'Use address',
+    'add_new_address' => 'Add new address',
+
+    'selected_address_title' => 'Selected shipping address:',
+    'field_name' => 'Full name',
+    'field_email' => 'Email',
+    'field_phone' => 'Phone',
+    'field_country' => 'Country code',
+    'field_address_1' => 'Address line 1',
+    'field_address_2' => 'Address line 2',
+    'field_city' => 'City',
+    'field_state' => 'State / Region',
+    'field_postal_code' => 'Postal code',
+
+    'label_name' => 'Name:',
+    'label_email' => 'Email:',
+    'label_phone' => 'Phone:',
+    'label_address' => 'Address:',
+    'label_city' => 'City:',
+    'label_state' => 'State:',
+    'label_postal_code' => 'Postal code:',
+    'label_country' => 'Country:',
+
+    'back_to_cart' => 'Back to cart',
+    'place_order' => 'Place order',
+
+    'order_summary_title' => 'Order summary:',
+    'discount_code' => 'Discount code',
+    'discount_placeholder' => 'WELCOME10',
+    'discount_applied' => 'Applied code :code',
+    'shipping_line' => 'Shipping',
+    'subtotal' => 'Subtotal',
+    'total' => 'Total',
+    'discount_line' => 'Discount · :code',
+    'payment_note' => 'Payment is not collected yet. Stripe and PayPal are the next steps.',
+
+    'confirmation_order_placed' => 'Order #VF:id is :status',
+    'confirmation_checkout' => 'Checkout is :status',
+    'confirmation_paid' => 'Your order has been placed and payment was confirmed. A payment provider has confirmed the payment for this order.',
+    'confirmation_no_payment' => 'Your order has not been placed yet. It will only be placed after Stripe or PayPal confirms the payment.',
+    'confirmation_awaiting' => 'The order has been created and is waiting for payment confirmation.',
+    'payment_error' => 'Payment could not be started.',
+    'purchase_history' => 'Purchase history',
+    'download_invoice' => 'Download invoice',
+
+    'shipment_details' => 'Shipment details',
+    'summary' => 'Summary',
+    'label_status' => 'Status',
+    'label_payment_method' => 'Payment method',
+    'back_to_address' => 'Back to address selection',
+    'pay_stripe' => 'Pay with Stripe',
+    'pay_paypal' => 'Pay with PayPal',
+    'apple_google_pay_note' => 'Apple Pay and Google Pay are available at checkout.',
+];

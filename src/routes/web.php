@@ -17,10 +17,13 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\PayPalCheckoutController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StripeCheckoutController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+
+Route::post('/language', [LanguageController::class, 'switch'])->name('language.switch');
 
 Route::redirect('/', '/products');
 

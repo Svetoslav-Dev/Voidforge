@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'page_title' => 'Тениски | VoidForgeStore',
+    'heading' => 'Разгледай тениски',
+    'lead' => 'Разгледайте наличните тениски по категория.',
+    'category_all' => 'Всички',
+    'uncategorized' => 'Без категория',
+    'view_shirt' => 'Виж тениска',
+    'add_to_cart' => 'Добави в количката',
+    'no_shirts_found' => 'Няма намерени тениски',
+    'no_shirts_found_hint' => 'Опитайте друга категория.',
+
+    'details_shirt_details' => 'Детайли за тениската',
+    'details_sku' => 'Артикул: :sku',
+    'details_price' => 'Цена: :price EUR',
+    'details_availability' => 'Наличност:',
+    'details_size' => 'Размер',
+    'details_quantity' => 'Количество',
+    'details_sold_out_size' => ':size · Изчерпан',
+    'details_all_sizes_sold_out' => 'Всички размери за този дизайн са изчерпани.',
+    'details_shirt_page' => 'Страница на тениската',
+    'details_shirt_page_hint' => 'Изберете размер сега или се върнете по-късно от историята на поръчките.',
+    'details_back_to_shirts' => 'Обратно към тениските',
+    'details_open_cart' => 'Отвори количката',
+    'details_could_not_update_cart' => 'Количката не може да бъде актуализирана.',
+    'details_front' => 'Лице',
+    'details_back' => 'Гръб',
+    'details_show_image' => 'Покажи :side на :name',
+];

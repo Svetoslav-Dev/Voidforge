@@ -321,20 +321,49 @@ a { color: inherit; }
 }
 
 .cookie-consent {
-    position: sticky;
-    bottom: 1rem;
-    z-index: 30;
-    margin: 1rem 0;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cookie-consent__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 8, 16, 0.74);
+    backdrop-filter: blur(4px);
 }
 
 .cookie-consent__panel {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+    width: min(42rem, calc(100vw - 2rem));
+    margin: auto;
+    display: grid;
     gap: 1rem;
     border-color: rgba(216, 154, 88, 0.34);
     background: rgba(16, 17, 27, 0.94);
     backdrop-filter: blur(12px);
+}
+
+.cookie-consent__options {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.cookie-consent__option {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.cookie-consent__option strong {
+    color: #d89a58;
 }
 
 .cookie-consent__copy {
@@ -1445,16 +1474,7 @@ button:disabled {
         grid-template-columns: 1fr;
     }
 
-    .cookie-consent__panel {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .cookie-consent__actions {
-        justify-content: stretch;
-    }
-
-    .site-footer__grid {
+.site-footer__grid {
         grid-template-columns: 1fr;
     }
 }

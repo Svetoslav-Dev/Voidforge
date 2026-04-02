@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'page_title' => 'Shirts | VoidForgeStore',
+    'heading' => 'Browse Shirts',
+    'lead' => 'Browse the current shirts by category. The demo lineup now carries more shirts so the storefront feels closer to a real first release.',
+    'category_all' => 'All',
+    'uncategorized' => 'Uncategorized',
+    'view_shirt' => 'View shirt',
+    'add_to_cart' => 'Add to cart',
+    'no_shirts_found' => 'No shirts found',
+    'no_shirts_found_hint' => 'Try another category or seed the demo shirts again.',
+
+    'details_shirt_details' => 'Shirt Details',
+    'details_sku' => 'SKU: :sku',
+    'details_price' => 'Price: :price EUR',
+    'details_availability' => 'Availability:',
+    'details_size' => 'Size',
+    'details_quantity' => 'Quantity',
+    'details_sold_out_size' => ':size · Sold out',
+    'details_all_sizes_sold_out' => 'All shirt sizes are currently sold out for this design.',
+    'details_shirt_page' => 'Shirt Page',
+    'details_shirt_page_hint' => 'Pick your size now, or return later through your account purchase history and receipts.',
+    'details_back_to_shirts' => 'Back to shirts',
+    'details_open_cart' => 'Open cart',
+    'details_could_not_update_cart' => 'Could not update cart.',
+    'details_front' => 'Front',
+    'details_back' => 'Back',
+    'details_show_image' => 'Show :side of :name',
+];

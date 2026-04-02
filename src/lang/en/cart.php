@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'page_title' => 'Cart | VoidForgeStore',
+    'heading' => 'Review your shirt selection',
+    'lead' => 'Check your items, update quantities, and apply a discount code before heading to checkout.',
+    'empty_heading' => 'Your cart is empty',
+    'empty_hint' => 'Browse the shirts and add a few pieces before moving to checkout.',
+    'order_summary' => 'Order Summary',
+    'discount_code' => 'Discount code',
+    'discount_placeholder' => 'WELCOME10',
+    'discount_applied' => 'Applied code :code',
+    'subtotal' => 'Subtotal',
+    'total' => 'Total',
+    'shipping_note' => 'Shipping and payment are added in the next checkout step.',
+    'continue_to_shipping' => 'Continue to shipping address',
+    'qty' => 'Qty',
+    'update' => 'Update',
+    'remove' => 'Remove',
+    'apply' => 'Apply',
+    'sku' => 'SKU: :sku',
+    'size' => 'Size: :size',
+    'price_each' => ':price EUR each',
+    'discount_line' => 'Discount · :code',
+];

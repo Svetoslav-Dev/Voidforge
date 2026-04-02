@@ -1,20 +1,18 @@
-@extends('layouts.app', ['title' => 'Purchase History | Voidforge'])
+@extends('layouts.app', ['title' => __('orders.history_page_title')])
 
 @section('content')
     <section class="card hero">
         <div>
-            <h1>Your paid and pending shirt receipts.</h1>
-            <p class="lead">
-                Review previous checkouts, reopen receipts, and see which payment provider was used for each order.
-            </p>
+            <h1>{{ __('orders.history_heading') }}</h1>
+            <p class="lead">{{ __('orders.history_lead') }}</p>
         </div>
     </section>
 
     <div data-order-history>
         <div class="chip-row" style="margin-top: 1.5rem;" data-order-history-chips>
-            <a class="chip {{ $activeStatus === null ? 'active' : '' }}" href="{{ route('orders.index') }}">All</a>
-            <a class="chip {{ $activeStatus === 'paid' ? 'active' : '' }}" href="{{ route('orders.index', ['status' => 'paid']) }}">Paid</a>
-            <a class="chip {{ $activeStatus === 'awaiting_payment' ? 'active' : '' }}" href="{{ route('orders.index', ['status' => 'awaiting_payment']) }}">Awaiting payment</a>
+            <a class="chip {{ $activeStatus === null ? 'active' : '' }}" href="{{ route('orders.index') }}">{{ __('orders.filter_all') }}</a>
+            <a class="chip {{ $activeStatus === 'paid' ? 'active' : '' }}" href="{{ route('orders.index', ['status' => 'paid']) }}">{{ __('orders.filter_paid') }}</a>
+            <a class="chip {{ $activeStatus === 'awaiting_payment' ? 'active' : '' }}" href="{{ route('orders.index', ['status' => 'awaiting_payment']) }}">{{ __('orders.filter_awaiting') }}</a>
         </div>
 
     <section class="list-stack" style="margin-top: 1rem;">
@@ -26,14 +24,14 @@
                         <h2 style="margin: 0 0 0.4rem; color: #4ecba3;">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</h2>
                         <p class="muted">
                             {{ optional($order->placed_at)->format('M d, Y') ?? $order->created_at->format('M d, Y') }}
-                            · {{ $order->items->sum('quantity') }} shirts
+                            · {{ __('orders.shirts_count', ['count' => $order->items->sum('quantity')]) }}
                         </p>
                     </div>
 
                     <div style="text-align: right;">
                         <strong>{{ number_format($order->total_cents / 100, 2) }} EUR</strong>
                         <p class="muted">
-                            {{ $order->payments->first()?->provider ? ucfirst($order->payments->first()->provider) : 'Awaiting payment' }}
+                            {{ $order->payments->first()?->provider ? ucfirst($order->payments->first()->provider) : __('orders.awaiting_payment') }}
                         </p>
                     </div>
                 </div>
@@ -52,18 +50,18 @@
                 @endforeach
 
                 <div class="actions">
-                    <a class="button secondary" href="{{ route('orders.show', ['orderReference' => 'VF'.$order->id]) }}">Open receipt</a>
+                    <a class="button secondary" href="{{ route('orders.show', ['orderReference' => 'VF'.$order->id]) }}">{{ __('orders.open_receipt') }}</a>
                     @if ($order->placed_at)
-                        <a class="button secondary" href="{{ route('orders.download', ['orderReference' => 'VF'.$order->id]) }}">Download PDF</a>
+                        <a class="button secondary" href="{{ route('orders.download', ['orderReference' => 'VF'.$order->id]) }}">{{ __('orders.download_pdf') }}</a>
                     @endif
                 </div>
             </article>
         @empty
             <article class="card empty-state">
-                <h2>No purchases yet</h2>
-                <p class="muted">Once you complete checkout, your receipts will be listed here.</p>
+                <h2>{{ __('orders.empty_heading') }}</h2>
+                <p class="muted">{{ __('orders.empty_hint') }}</p>
                 <div class="actions">
-                    <a class="button secondary" href="{{ route('products.index') }}">Browse shirts</a>
+                    <a class="button secondary" href="{{ route('products.index') }}">{{ __('orders.browse_shirts') }}</a>
                 </div>
             </article>
         @endforelse

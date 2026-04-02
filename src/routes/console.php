@@ -24,5 +24,5 @@ Artisan::command('cart:send-reminders', function (CartReminderService $cartRemin
 
 Schedule::command('orders:retry-completed-emails')->hourly();
 Schedule::command('cart:send-reminders')->daily();
-Schedule::command('sitemap:generate')->daily();
+Schedule::command('sitemap:generate')->daily()->timezone('Europe/Sofia');
 Schedule::command('orders:prune-abandoned')->monthly();
