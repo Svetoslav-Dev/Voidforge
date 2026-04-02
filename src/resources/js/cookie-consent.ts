@@ -36,7 +36,8 @@ function readConsentCookie(): ConsentValue | null {
 
 function writeConsentCookie(value: ConsentValue): void {
     const maxAge = 60 * 60 * 24 * 365;
-    document.cookie = `${consentCookieName}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+    const secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${consentCookieName}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
 }
 
 function readConsent(): ConsentValue | null {
@@ -135,6 +136,8 @@ function initializeCookieConsent(): void {
 
     if (existingConsent === null) {
         showConsentBanner();
+    } else {
+        hideConsentBanner();
     }
 
     essentialPreferencesButton?.addEventListener('click', () => {

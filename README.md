@@ -16,15 +16,15 @@ VoidForgeStore is a Laravel e-commerce storefront for selling shirts, with authe
 ## What The App Does
 
 - customer authentication and account management
-- product catalog with category filtering and AJAX cart actions
+- product catalog with category filtering and cart actions
 - cart, shipping, payment, and completed-order flow
 - hosted Stripe and PayPal checkout
 - saved shipping addresses and saved Stripe cards
 - customer receipt history and PDF invoice download
 - queued order-completion emails with retry support
-- legal policy pages, cookie preferences, and a public privacy/support request form
+- legal policy pages, cookie preferences modal, and a public privacy/support request form
 - admin management for shirts, categories, users, orders, and discount codes
-- local self-hosting with optional Cloudflare Tunnel exposure
+- local self-hosting with Cloudflare Tunnel for public HTTPS exposure
 
 ## Run Locally
 
@@ -50,7 +50,7 @@ cp src/.env.example src/.env
 ### 2. Build and start containers
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 The app container serves:
@@ -94,7 +94,7 @@ docker compose exec app php artisan queue:work --tries=5
 
 ### 6. Run the scheduler
 
-Cart reminders are scheduled daily. Keep the Laravel scheduler running in environments where you want reminders to send automatically:
+Cart reminders and the sitemap are scheduled daily. Keep the Laravel scheduler running in environments where you want these to fire automatically:
 
 ```bash
 docker compose exec app php artisan schedule:work
@@ -122,22 +122,15 @@ Seeded demo data also includes:
 - catalog categories and shirts
 - default discount codes
 
+See [TestCredentials/UserCredentials.md](TestCredentials/UserCredentials.md) and [TestCredentials/PaymentCredentials.md](TestCredentials/PaymentCredentials.md) for full credential details.
+
 ## Payment Configuration
 
 Stripe and PayPal use environment variables only. Do not hardcode secrets.
 
-Relevant variables are in:
+Relevant variables are in `.env.example` and `src/.env.example`.
 
-- `.env.example`
-- `src/.env.example`
-
-Additional notes:
-
-- payment test credentials: [PaymentCredentials.md](/home/thinkpadl14/Projects/Voidforge/PaymentCredentials.md)
-- user credentials: [UserCredentials.md](/home/thinkpadl14/Projects/Voidforge/UserCredentials.md)
-- improvement notes: [Improvements](/home/thinkpadl14/Projects/Voidforge/Improvements)
-
-Stripe hosted Checkout now defers wallet availability to Stripe Dashboard settings for hosted payment sessions. That allows wallet methods such as Google Pay and Apple Pay to appear when Stripe says the current device, browser, HTTPS domain, and customer wallet state support them.
+Stripe hosted Checkout defers wallet availability to Stripe Dashboard settings for hosted payment sessions. That allows wallet methods such as Google Pay and Apple Pay to appear when Stripe says the current device, browser, HTTPS domain, and customer wallet state support them.
 
 Wallet testing is primarily manual:
 
@@ -145,17 +138,11 @@ Wallet testing is primarily manual:
 - test Apple Pay in Safari on a supported Apple device with Apple Pay configured
 - use the live HTTPS domain when testing wallets, not plain local HTTP
 
-## Legal And Compliance Features
+## Cookie Consent
 
-The storefront now includes a first compliance-oriented layer for customer-facing disclosures:
+Cookie preferences are handled client-side with a centered modal popup. Choosing an option dismisses the modal immediately without a page refresh. The choice is persisted to `localStorage` and a first-party cookie. A background AJAX call syncs the preference to the server session so the modal stays dismissed across page loads.
 
-- legal pages for privacy, terms, returns, shipping, cookies, and trader information
-- footer links to those pages on every screen
-- pre-payment policy links on the shipping step
-- a cookie-preferences banner and footer shortcut
-- a public request form for privacy, returns, order-support, and general contact requests
-
-The legal text is still placeholder-oriented and should be replaced with your real business and policy details before treating it as final.
+The `[hidden]` CSS reset is applied globally so the `hidden` attribute always works regardless of display rules on the element.
 
 ## Email Configuration
 
@@ -171,11 +158,9 @@ Transactional mail is configured through SMTP environment variables only. For Br
 - `MAIL_FROM_ADDRESS=orders@voidforgestore.com`
 - `MAIL_FROM_NAME=Voidforge`
 
-Docker now passes these mail variables through from the project root `.env`, so you can switch the whole stack to Brevo without touching PHP code.
+Docker passes these mail variables through from the project root `.env`.
 
 Order completion emails are queued after a paid order and tracked on the order as `pending`, `sent`, or `failed`.
-
-For a real public store, prefer a sender on your own domain such as `orders@voidforgestore.com` instead of a temporary mailbox.
 
 To retry failed or stuck order emails manually:
 
@@ -193,9 +178,9 @@ Public legal/privacy contact requests are also queued through the same Laravel m
 
 ## Sitemap
 
-A sitemap is generated at `public/sitemap.xml` by the `sitemap:generate` artisan command. It includes all static public pages and every active product page.
+A sitemap is generated at `public/sitemap.xml` by the `sitemap:generate` artisan command. It includes all static public pages and every active product page. The sitemap regenerates daily by the Laravel scheduler at Bulgarian time (Europe/Sofia).
 
-The sitemap is regenerated daily by the Laravel scheduler. To generate it manually:
+To generate it manually:
 
 ```bash
 docker compose exec app php artisan sitemap:generate
@@ -205,7 +190,7 @@ docker compose exec app php artisan sitemap:generate
 
 ## Legal Configuration
 
-The storefront now reads trader and policy-facing contact details from environment variables:
+The storefront reads trader and policy-facing contact details from environment variables:
 
 - `LEGAL_TRADER_NAME`
 - `LEGAL_TRADER_ADDRESS`
@@ -222,19 +207,31 @@ The storefront now reads trader and policy-facing contact details from environme
 
 These values feed the footer, legal pages, and the public request page. Update them before launch so the published legal details match the real business.
 
-## Production Notes
+## Legal And Compliance Features
 
-To run the site publicly on `voidforgestore.com` from your own computer, the repo includes Cloudflare Tunnel support. The current tunnel setup uses Cloudflare public HTTPS and forwards traffic internally to `http://app:8000`, so no router port forwarding is required.
+- legal pages for privacy, terms, returns, shipping, cookies, and trader information
+- footer links to those pages on every screen
+- pre-payment policy links on the shipping step
+- a cookie-preferences modal and footer shortcut
+- a public request form for privacy, returns, order-support, and general contact requests
 
-The production Docker override also starts:
+The legal text is placeholder-oriented and should be replaced with real business and policy details before going live.
 
-- a dedicated queue worker service
-- a dedicated Laravel scheduler service
-- the Cloudflare tunnel service
+## Production Setup
+
+The site runs publicly at `https://voidforgestore.com` through a Cloudflare Tunnel running as a systemd service on the host machine. No router port forwarding is needed.
+
+```
+Browser ──HTTPS──▶ Cloudflare ──HTTPS──▶ localhost:8443 (self-signed cert, noTLSVerify)
+```
+
+Cloudflare manages and auto-renews the public certificate. The internal leg uses a self-signed certificate which the tunnel skips validating.
+
+`AppServiceProvider` calls `URL::forceRootUrl` and `URL::forceScheme` unconditionally, deriving the scheme from `APP_URL`. This prevents the internal port 8443 from leaking into generated asset URLs and redirects when the request arrives through the tunnel.
 
 See:
 
-- [Improvements/CloudflareTunnel.md](/home/thinkpadl14/Projects/Voidforge/Improvements/CloudflareTunnel.md)
-- [Improvements/Certificates.md](/home/thinkpadl14/Projects/Voidforge/Improvements/Certificates.md)
-- [Improvements/ProductionChecklist.md](/home/thinkpadl14/Projects/Voidforge/Improvements/ProductionChecklist.md)
-- [Improvements/Compliance.md](/home/thinkpadl14/Projects/Voidforge/Improvements/Compliance.md)
+- [GettingStarted/CloudflareSetup.md](GettingStarted/CloudflareSetup.md)
+- [GettingStarted/CloudflareTunnel.md](GettingStarted/CloudflareTunnel.md)
+- [GettingStarted/Certificates.md](GettingStarted/Certificates.md)
+- [GettingStarted/ProductionChecklist.md](GettingStarted/ProductionChecklist.md)

@@ -25,10 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->environment('production')) {
-            URL::forceRootUrl(config('app.url'));
-            URL::forceScheme('https');
-        }
+        URL::forceRootUrl(config('app.url'));
+        URL::forceScheme(parse_url(config('app.url'), PHP_URL_SCHEME) ?: 'https');
 
         RateLimiter::for('auth.login', function (Request $request): Limit {
             return Limit::perMinute(5)->by(
