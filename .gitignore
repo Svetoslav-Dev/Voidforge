@@ -1,5 +1,10 @@
+# Hide folders
+/GettingStarted
+/Improvements
+
 # Ignore LLM
 .codex
+.claude
 
 # Editing files
 .README.md.swp
