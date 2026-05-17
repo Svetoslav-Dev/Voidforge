@@ -74,7 +74,7 @@ This does:
 - creates `src/.env` if missing
 - generates the Laravel app key
 - runs migrations
-- seeds demo data
+- seeds the base catalog and defaults
 - installs frontend dependencies
 - builds frontend assets
 
@@ -106,23 +106,31 @@ docker compose exec app php artisan schedule:work
 docker compose exec app npm run build
 ```
 
-## Demo Accounts
+## Demo Mode
 
-The seeded local setup creates:
+Shared demo accounts are now opt-in. The default setup does not create the public admin/customer users.
+
+To enable the throwaway public demo accounts, set `DEMO_MODE=true` in both `.env` and `src/.env`, then reseed:
+
+```bash
+docker compose exec app php artisan migrate:fresh --seed
+```
+
+With demo mode enabled, the seeded setup creates:
 
 - Admin: `demo-admin@example.test` / `DemoPass123!`
 - Customer: `demo-user@example.test` / `DemoPass123!`
 
 Both users have seeded receipts and default shipping addresses.
 
-Seeded demo data also includes:
+Demo mode also includes:
 
 - completed and pending orders
 - default shipping addresses
 - catalog categories and shirts
 - default discount codes
 
-See [TestCredentials/UserCredentials.md](TestCredentials/UserCredentials.md) and [TestCredentials/PaymentCredentials.md](TestCredentials/PaymentCredentials.md) for full credential details.
+See [TestCredentials/UserCredentials.md](TestCredentials/UserCredentials.md) for the shared demo credentials.
 
 ## Payment Configuration
 

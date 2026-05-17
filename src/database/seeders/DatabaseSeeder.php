@@ -23,30 +23,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $demoMode = filter_var(env('DEMO_MODE', false), FILTER_VALIDATE_BOOL);
+
         $this->upsertUser([
             'email' => 'test@example.com',
         ], [
             'name' => 'Test User',
             'is_admin' => false,
             'password' => 'password',
-        ]);
-
-        $this->migrateLegacyCookieUser();
-
-        $cookie = $this->upsertUser([
-            'email' => 'demo-user@example.test',
-        ], [
-            'name' => 'Demo User',
-            'is_admin' => false,
-            'password' => 'DemoPass123!',
-        ]);
-
-        $cookieDestroyer = $this->upsertUser([
-            'email' => 'demo-admin@example.test',
-        ], [
-            'name' => 'Demo Admin',
-            'is_admin' => true,
-            'password' => 'DemoPass123!',
         ]);
 
         $categories = [
@@ -203,6 +187,28 @@ class DatabaseSeeder extends Seeder
                 'expires_at' => null,
             ]
         );
+
+        if (! $demoMode) {
+            return;
+        }
+
+        $this->migrateLegacyCookieUser();
+
+        $cookie = $this->upsertUser([
+            'email' => 'demo-user@example.test',
+        ], [
+            'name' => 'Demo User',
+            'is_admin' => false,
+            'password' => 'DemoPass123!',
+        ]);
+
+        $cookieDestroyer = $this->upsertUser([
+            'email' => 'demo-admin@example.test',
+        ], [
+            'name' => 'Demo Admin',
+            'is_admin' => true,
+            'password' => 'DemoPass123!',
+        ]);
 
         $this->seedPurchaseHistory($cookie, [
             [

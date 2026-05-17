@@ -1,6 +1,12 @@
 # User Credentials
 
-Local demo accounts that should exist after the standard project setup and seeding flow.
+These accounts exist only when demo mode is enabled.
+
+Enable `DEMO_MODE=true` in both `.env` and `src/.env`, then reseed with:
+
+```bash
+docker compose exec app php artisan migrate:fresh --seed
+```
 
 ## Admin user
 
