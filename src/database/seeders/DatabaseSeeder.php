@@ -192,9 +192,9 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $this->migrateLegacyCookieUser();
+        $this->migrateLegacyDemoUser();
 
-        $cookie = $this->upsertUser([
+        $demoUser = $this->upsertUser([
             'email' => 'demo-user@example.test',
         ], [
             'name' => 'Demo User',
@@ -202,7 +202,7 @@ class DatabaseSeeder extends Seeder
             'password' => 'DemoPass123!',
         ]);
 
-        $cookieDestroyer = $this->upsertUser([
+        $demoAdmin = $this->upsertUser([
             'email' => 'demo-admin@example.test',
         ], [
             'name' => 'Demo Admin',
@@ -210,7 +210,7 @@ class DatabaseSeeder extends Seeder
             'password' => 'DemoPass123!',
         ]);
 
-        $this->seedPurchaseHistory($cookie, [
+        $this->seedPurchaseHistory($demoUser, [
             [
                 'placed_at' => Carbon::parse('2025-03-14 16:10:00'),
                 'status' => 'paid',
@@ -281,7 +281,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        $this->seedPurchaseHistory($cookieDestroyer, [
+        $this->seedPurchaseHistory($demoAdmin, [
             [
                 'placed_at' => Carbon::parse('2025-03-22 20:05:00'),
                 'status' => 'paid',
@@ -352,7 +352,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        $this->seedDefaultShippingAddress($cookie, [
+        $this->seedDefaultShippingAddress($demoUser, [
             'label' => 'Home',
             'recipient_name' => 'Demo User',
             'phone' => '+359-88-000-0000',
@@ -364,7 +364,7 @@ class DatabaseSeeder extends Seeder
             'country' => 'BG',
         ]);
 
-        $this->seedDefaultShippingAddress($cookieDestroyer, [
+        $this->seedDefaultShippingAddress($demoAdmin, [
             'label' => 'HQ',
             'recipient_name' => 'Demo Admin',
             'phone' => '+359-88-100-1000',
@@ -495,9 +495,9 @@ class DatabaseSeeder extends Seeder
     }
 
     /**
-     * Move the legacy demo seed user to the current gmail address.
+     * Move the legacy demo user to the current demo address.
      */
-    private function migrateLegacyCookieUser(): void
+    private function migrateLegacyDemoUser(): void
     {
         $legacyUser = User::withTrashed()
             ->where('email', 'cookie@example.com')

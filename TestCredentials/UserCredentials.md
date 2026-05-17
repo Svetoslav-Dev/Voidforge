@@ -16,7 +16,7 @@ docker compose exec app php artisan migrate:fresh --seed
 
 ## Regular user with receipts
 
-- Name: `Cookie`
+- Name: `Demo User`
 - Email: `demo-user@example.test`
 - Password: `DemoPass123!`
 
