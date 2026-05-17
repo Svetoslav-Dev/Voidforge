@@ -50,6 +50,7 @@
 /src/public/sitemap.xml
 
 # Docker cache
+/docker/runtime/cache/*
 /docker/runtime/storage/logs/*
 /docker/runtime/storage/framework/cache/data/*
 /docker/runtime/storage/framework/sessions/*
