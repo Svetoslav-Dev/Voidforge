@@ -9,6 +9,8 @@
 .env.testing
 .env.*
 !.env.example
+/docker/*.env
+/docker/*.env.*
 
 # packages
 /src/vendor
@@ -16,6 +18,22 @@
 /src/.env
 /src/.env.*
 !/src/.env.example
+
+# Local sensitive data
+/TestCredentials/*
+!/TestCredentials/UserCredentials.md
+/secrets/
+/certs/
+/certificates/
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.ovpn
+*.kdbx
+*.asc
 
 #Storage cache
 /src/storage/*.key
