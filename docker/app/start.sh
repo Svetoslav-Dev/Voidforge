@@ -85,26 +85,36 @@ http {
         listen ${APP_HTTPS_PORT} ssl;
         server_name ${CERT_SERVER_NAMES};
 
+        root /var/www/html/public;
+        index index.php;
+
         ssl_certificate ${NGINX_CERT_CRT_PATH};
         ssl_certificate_key ${NGINX_CERT_KEY_PATH};
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_prefer_server_ciphers on;
 
+        error_page 502 503 504 /offline.html;
+        location = /offline.html {
+            internal;
+        }
+
         location / {
-            proxy_pass http://127.0.0.1:9000;
-            proxy_http_version 1.1;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto https;
-            proxy_set_header X-Forwarded-Port ${APP_HTTPS_PORT};
+            try_files \$uri \$uri/ /index.php?\$query_string;
+        }
+
+        location ~ \.php$ {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+            include /etc/nginx/fastcgi_params;
         }
     }
 }
 EOF
 
-php artisan serve --host=127.0.0.1 --port=9000 &
-APP_SERVER_PID=$!
+php-fpm --nodaemonize &
+FPM_PID=$!
 
-trap 'kill ${APP_SERVER_PID} >/dev/null 2>&1 || true' INT TERM EXIT
+trap 'kill ${FPM_PID} >/dev/null 2>&1 || true' INT TERM EXIT
 
 exec nginx -c /tmp/nginx/nginx.conf -g 'daemon off;'
