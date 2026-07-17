@@ -1,6 +1,5 @@
 # Hide folders
-/GettingStarted
-/Improvements
+/docs
 
 # Ignore LLM
 .codex
