@@ -72,6 +72,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 ? $exception->getStatusCode()
                 : 500;
 
+            if ($status === 503) {
+                return null;
+            }
+
             return response()->view('errors.generic', [
                 'status' => $status,
                 'title' => match ($status) {
