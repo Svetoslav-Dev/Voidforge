@@ -28,11 +28,16 @@ jobs:
           --health-retries=10
 
     env:
+      APP_ENV: testing
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
+      DB_CONNECTION: mariadb
       DB_DATABASE: voidforge_test
       DB_USERNAME: voidforge
       DB_PASSWORD: secret
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
 
     steps:
       - uses: actions/checkout@v4
