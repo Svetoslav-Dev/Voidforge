@@ -11,10 +11,21 @@
     </section>
 
     <div data-order-history>
-        <div class="chip-row" style="margin-top: 1.5rem;" data-order-history-chips>
-            <a class="chip {{ $activeStatus === null ? 'active' : '' }}" href="{{ route('orders.index') }}">All</a>
-            <a class="chip {{ $activeStatus === 'paid' ? 'active' : '' }}" href="{{ route('orders.index', ['status' => 'paid']) }}">Paid</a>
-            <a class="chip {{ $activeStatus === 'awaiting_payment' ? 'active' : '' }}" href="{{ route('orders.index', ['status' => 'awaiting_payment']) }}">Awaiting payment</a>
+        <form method="GET" action="{{ route('orders.index') }}" class="inline-form order-search" style="margin-top: 1.5rem;" data-order-history-search>
+            @if ($activeStatus !== null)
+                <input type="hidden" name="status" value="{{ $activeStatus }}">
+            @endif
+            <input type="search" name="q" value="{{ $search }}" placeholder="Search by order number or shirt name" aria-label="Search orders">
+            <button type="submit" class="button secondary">Search</button>
+            @if ($search !== '')
+                <a class="button secondary" href="{{ route('orders.index', $activeStatus !== null ? ['status' => $activeStatus] : []) }}">Clear</a>
+            @endif
+        </form>
+
+        <div class="chip-row" style="margin-top: 1rem;" data-order-history-chips>
+            <a class="chip {{ $activeStatus === null ? 'active' : '' }}" href="{{ route('orders.index', $search !== '' ? ['q' => $search] : []) }}">All</a>
+            <a class="chip {{ $activeStatus === 'paid' ? 'active' : '' }}" href="{{ route('orders.index', array_filter(['status' => 'paid', 'q' => $search !== '' ? $search : null])) }}">Paid</a>
+            <a class="chip {{ $activeStatus === 'awaiting_payment' ? 'active' : '' }}" href="{{ route('orders.index', array_filter(['status' => 'awaiting_payment', 'q' => $search !== '' ? $search : null])) }}">Awaiting payment</a>
         </div>
 
     <section class="list-stack" style="margin-top: 1rem;">
@@ -60,11 +71,19 @@
             </article>
         @empty
             <article class="card empty-state">
-                <h2>No purchases yet</h2>
-                <p class="muted">Once you complete checkout, your receipts will be listed here.</p>
-                <div class="actions">
-                    <a class="button secondary" href="{{ route('products.index') }}">Browse shirts</a>
-                </div>
+                @if ($search !== '')
+                    <h2>No orders match "{{ $search }}"</h2>
+                    <p class="muted">Try a different order number or shirt name.</p>
+                    <div class="actions">
+                        <a class="button secondary" href="{{ route('orders.index', $activeStatus !== null ? ['status' => $activeStatus] : []) }}">Clear search</a>
+                    </div>
+                @else
+                    <h2>No purchases yet</h2>
+                    <p class="muted">Once you complete checkout, your receipts will be listed here.</p>
+                    <div class="actions">
+                        <a class="button secondary" href="{{ route('products.index') }}">Browse shirts</a>
+                    </div>
+                @endif
             </article>
         @endforelse
     </section>

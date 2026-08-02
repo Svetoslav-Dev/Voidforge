@@ -18,6 +18,7 @@ class OrderHistoryController extends Controller
         $status = $request->query('status');
         $allowedStatuses = ['paid', 'awaiting_payment'];
         $activeStatus = in_array($status, $allowedStatuses, true) ? $status : null;
+        $search = trim((string) $request->query('q', ''));
 
         $query = $request->user()
             ->orders()
@@ -28,9 +29,24 @@ class OrderHistoryController extends Controller
             $query->where('status', $activeStatus);
         }
 
+        if ($search !== '') {
+            $orderId = preg_match('/^VF(\d+)$/i', $search, $matches) ? (int) $matches[1] : null;
+
+            $query->where(function ($q) use ($search, $orderId) {
+                if ($orderId !== null) {
+                    $q->orWhere('id', $orderId);
+                }
+
+                $q->orWhereHas('items', function ($items) use ($search) {
+                    $items->where('product_name', 'like', '%'.addcslashes($search, '%_\\').'%');
+                });
+            });
+        }
+
         return view('orders.history', [
-            'orders' => $query->paginate(10),
+            'orders' => $query->paginate(10)->withQueryString(),
             'activeStatus' => $activeStatus,
+            'search' => $search,
         ]);
     }
 

@@ -70,6 +70,49 @@ class OrderHistoryTest extends TestCase
             ->assertHeader('content-disposition', 'attachment; filename="voidforge-receipt-VF'.$order->id.'.pdf"');
     }
 
+    public function test_user_can_search_purchase_history_by_order_number(): void
+    {
+        $user = User::factory()->create();
+        $match = $this->orderFor($user, transactionId: 'tx-match');
+        $other = $this->orderFor($user, transactionId: 'tx-other');
+
+        $this->actingAs($user)
+            ->get(route('orders.index', ['q' => 'VF'.$match->id]))
+            ->assertOk()
+            ->assertSee('VF'.$match->id)
+            ->assertDontSee('VF'.$other->id);
+    }
+
+    public function test_user_can_search_purchase_history_by_product_name(): void
+    {
+        $user = User::factory()->create();
+        $order = $this->orderFor($user);
+
+        $this->actingAs($user)
+            ->get(route('orders.index', ['q' => 'forge mark']))
+            ->assertOk()
+            ->assertSee('VF'.$order->id);
+
+        $this->actingAs($user)
+            ->get(route('orders.index', ['q' => 'no such shirt']))
+            ->assertOk()
+            ->assertDontSee('VF'.$order->id);
+    }
+
+    public function test_search_only_returns_the_authenticated_users_orders(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $ownOrder = $this->orderFor($user, transactionId: 'tx-own-search');
+        $otherOrder = $this->orderFor($otherUser, transactionId: 'tx-other-search');
+
+        $this->actingAs($user)
+            ->get(route('orders.index', ['q' => 'VF'.$otherOrder->id]))
+            ->assertOk()
+            ->assertDontSee('Order #VF'.$otherOrder->id)
+            ->assertSee('No orders match');
+    }
+
     public function test_user_can_open_and_repay_their_pending_order(): void
     {
         $user = User::factory()->create();

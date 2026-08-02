@@ -932,6 +932,11 @@ button:disabled {
     width: 11.5rem;
 }
 
+.order-search input {
+    width: 20rem;
+    max-width: 100%;
+}
+
 .receipt-item {
     display: grid;
     grid-template-columns: 72px minmax(0, 1fr);
