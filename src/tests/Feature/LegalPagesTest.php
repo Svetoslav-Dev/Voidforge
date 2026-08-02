@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -57,6 +58,8 @@ class LegalPagesTest extends TestCase
 
     public function test_cookie_consent_route_persists_the_selected_choice(): void
     {
+        $this->withoutMiddleware(PreventRequestForgery::class);
+
         $this->post(route('cookie-consent.store'), [
             'consent' => 'all',
             'return_to' => '/products',
