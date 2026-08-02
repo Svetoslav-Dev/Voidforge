@@ -47,6 +47,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('checkout.payment-start', function (Request $request): Limit {
+            if (app()->environment('testing')) {
+                return Limit::none();
+            }
+
             $user = $request->user();
             $key = $user
                 ? 'user:'.$user->getAuthIdentifier()
