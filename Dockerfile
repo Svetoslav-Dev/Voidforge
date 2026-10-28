@@ -16,6 +16,8 @@ RUN apt-get update \
         curl \
         nginx-light \
         openssl \
+        nodejs \
+        npm \
     && docker-php-ext-install \
         bcmath \
         intl \

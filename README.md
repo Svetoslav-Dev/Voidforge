@@ -72,7 +72,7 @@ cp src/.env.example src/.env
 ### 2. Build and start containers
 
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
 
 The app container serves:
@@ -84,7 +84,7 @@ HTTPS uses a local self-signed certificate by default.
 
 ### 3. Install app dependencies and bootstrap the project
 
-Run inside the app container:
+Once the containers are running, bootstrap the app:
 
 ```bash
 docker compose exec app composer setup

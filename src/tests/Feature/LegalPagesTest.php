@@ -10,6 +10,13 @@ class LegalPagesTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware(PreventRequestForgery::class);
+    }
+
     public function test_legal_pages_are_available(): void
     {
         $this->get(route('legal.privacy'))
