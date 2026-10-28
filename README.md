@@ -2,6 +2,28 @@
 
 VoidForgeStore is a Laravel e-commerce storefront for selling shirts, with authentication, catalog browsing, cart and shipping flow, hosted Stripe and PayPal payments, saved addresses and cards, receipts and PDF invoices, queued order emails, legal policy pages, cookie preferences, and an admin panel.
 
+## Page previews
+
+### Cookie preferences
+
+![Centered VoidForgeStore cookie preferences](docs/images/screenshots/cookie-preferences.png)
+
+### Browse shirts
+
+![VoidForgeStore Browse Shirts catalog](docs/images/screenshots/browse-shirts.png)
+
+### Product details
+
+![VoidForgeStore product details](docs/images/screenshots/product-details.png)
+
+### Checkout
+
+![VoidForgeStore checkout with a shirt in the order summary](docs/images/screenshots/checkout.png)
+
+### Admin dashboard
+
+![VoidForgeStore admin dashboard](docs/images/screenshots/admin-dashboard.png)
+
 ## Stack
 
 - Laravel
